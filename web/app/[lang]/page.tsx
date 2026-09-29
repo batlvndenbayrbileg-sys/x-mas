@@ -85,12 +85,12 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
           </Reveal>
           <Reveal blur className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
             <FeatureCard img={all.find(p=>p.slug==="converse-chuck-low-blue-check")?.image} title={t("home.feat1")} desc={t("home.feat1d")} />
-            <FeatureCard img={all.find(p=>p.slug==="converse-retro-trainer-green")?.image} title={t("home.feat3")} desc={t("home.feat3d")} />
+            <FeatureCard img={all.find(p=>p.slug==="converse-star-player-burgundy")?.image} title={t("home.feat3")} desc={t("home.feat3d")} />
           </Reveal>
           <Reveal blur delay={0.08} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
             <FeatureCard img={all.find(p=>p.slug==="converse-chuck70-hi-black")?.image} title={t("home.feat2")} desc={t("home.feat2d")} small />
-            <FeatureCard img={all.find(p=>p.slug==="nb-1906a-silver")?.image} title={t("home.feat4")} desc={t("home.feat4d")} small />
-            <FeatureCard img={all.find(p=>p.slug==="converse-chuck70-hi-natural")?.image} title={t("home.feat5")} desc={t("home.feat5d")} small />
+            <FeatureCard img={all.find(p=>p.slug==="converse-retro-trainer-burgundy")?.image} title={t("home.feat4")} desc={t("home.feat4d")} small />
+            <FeatureCard img={all.find(p=>p.slug==="converse-chuck-low-black-stars")?.image} title={t("home.feat5")} desc={t("home.feat5d")} small />
           </Reveal>
         </section>
 
@@ -212,16 +212,23 @@ function FeaturedCard({ product, t, drop }: { product: Product; t: (k:string)=>s
 }
 
 function FeatureCard({ img, title, desc, small }: { img?: string; title: string; desc: string; small?: boolean }) {
+  const isCutout = (img ?? "").endsWith(".png");
   return (
-    <div className={`group relative overflow-hidden rounded-[1.4rem] ${small ? "min-h-[180px]" : "min-h-[220px]"} bg-graphite`}>
-      {img && <Photo src={img} alt={title} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-105" />}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+    <div className={`group relative overflow-hidden rounded-[1.4rem] ${small ? "min-h-[200px]" : "min-h-[240px]"} card-dark`}>
+      {/* soft accent glow top-right */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-accent/20 blur-3xl" />
+      {img && (
+        <div className={`absolute ${isCutout ? "inset-x-2 top-2 bottom-16" : "inset-0"}`}>
+          <Photo src={img} alt={title} imgClassName={`transition-transform duration-700 ease-elegant group-hover:scale-105 ${isCutout ? "object-contain drop-shadow-[0_20px_24px_rgba(0,0,0,.5)]" : "object-cover"}`} />
+        </div>
+      )}
+      {!isCutout && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />}
       <div className="absolute left-5 bottom-5 right-5 text-white">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-accent" />
           <h3 className="font-display uppercase tracking-[.03em] text-[16px]">{title}</h3>
         </div>
-        <p className="text-white/70 text-[12.5px] mt-1 leading-snug">{desc}</p>
+        <p className="text-white/65 text-[12.5px] mt-1 leading-snug">{desc}</p>
       </div>
     </div>
   );
