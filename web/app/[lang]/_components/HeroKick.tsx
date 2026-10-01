@@ -5,6 +5,7 @@ import { LocaleLink as Link } from "@/components/LocaleLink";
 import { Photo } from "@/components/Photo";
 import { ArrowUpRight } from "@/components/Icons";
 import { useT } from "@/components/LangProvider";
+import { Parallax } from "./Parallax";
 import type { Product } from "@/lib/types";
 
 const ease: [number, number, number, number] = [0.22, 0.61, 0.36, 1];
@@ -23,8 +24,10 @@ export function HeroKick({ products }: { products: Product[] }) {
   return (
     <section className="relative overflow-hidden rounded-[2rem] bg-white border border-line shadow-[0_30px_80px_-50px_rgba(22,21,21,.5)]">
       <div className="grain absolute inset-0 opacity-40 pointer-events-none" />
-      {/* giant ghost brand wordmark, low in the panel */}
-      <span aria-hidden className="pointer-events-none select-none absolute -right-6 bottom-[-4%] font-display uppercase text-[24vw] lg:text-[15rem] leading-[.7] text-ink/[.035] whitespace-nowrap">SNEAKERS</span>
+      {/* giant ghost brand wordmark, low in the panel — drifts on scroll for depth */}
+      <Parallax amount={-28} className="pointer-events-none absolute inset-x-0 bottom-[-4%] z-0 text-right pr-6">
+        <span aria-hidden className="select-none font-display uppercase text-[24vw] lg:text-[15rem] leading-[.7] text-ink/[.035] whitespace-nowrap">SNEAKERS</span>
+      </Parallax>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] items-center gap-4 p-5 sm:p-8 lg:pl-12 lg:pr-8 lg:py-12 min-h-[440px] lg:min-h-[560px]">
         {/* Left — copy */}
@@ -67,15 +70,17 @@ export function HeroKick({ products }: { products: Product[] }) {
               transition={{ duration: 0.7, ease }}
               className="absolute inset-0 grid place-items-center"
             >
-              <div className="relative w-[88%] aspect-[4/3] -rotate-[7deg] animate-floaty">
-                <Photo
-                  src={hero.image}
-                  alt={hero.name}
-                  priority
-                  sizes="(max-width:1024px) 90vw, 45vw"
-                  imgClassName="object-contain drop-shadow-[0_40px_45px_rgba(22,21,21,.3)]"
-                />
-              </div>
+              <Parallax amount={22} className="relative w-[88%] aspect-[4/3]">
+                <div className="relative w-full h-full -rotate-[7deg] animate-floaty">
+                  <Photo
+                    src={hero.image}
+                    alt={hero.name}
+                    priority
+                    sizes="(max-width:1024px) 90vw, 45vw"
+                    imgClassName="object-contain drop-shadow-[0_40px_45px_rgba(22,21,21,.3)]"
+                  />
+                </div>
+              </Parallax>
             </motion.div>
 
             {/* badge */}

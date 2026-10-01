@@ -219,7 +219,13 @@ function FeatureCard({ img, title, desc, small }: { img?: string; title: string;
       <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-accent/20 blur-3xl" />
       {img && (
         <div className={`absolute ${isCutout ? "inset-x-2 top-2 bottom-16" : "inset-0"}`}>
-          <Photo src={img} alt={title} imgClassName={`transition-transform duration-700 ease-elegant group-hover:scale-105 ${isCutout ? "object-contain drop-shadow-[0_20px_24px_rgba(0,0,0,.5)]" : "object-cover"}`} />
+          {isCutout ? (
+            <Parallax amount={16} className="relative w-full h-full">
+              <Photo src={img} alt={title} imgClassName="object-contain drop-shadow-[0_20px_24px_rgba(0,0,0,.5)] transition-transform duration-700 ease-elegant group-hover:scale-105" />
+            </Parallax>
+          ) : (
+            <Photo src={img} alt={title} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-105" />
+          )}
         </div>
       )}
       {!isCutout && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />}
