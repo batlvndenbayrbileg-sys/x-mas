@@ -30,7 +30,7 @@ export function generateMetadata({ params }: { params: { lang: Lang } }): Metada
   };
 }
 
-const cats = ["all", "Converse", "New Balance"];
+const cats = ["all", "Converse", "New Balance", "UGG", "The North Face"];
 
 export default async function ShopPage({
   params,

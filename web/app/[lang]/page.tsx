@@ -40,6 +40,16 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
     all.find(p => p.slug === "converse-retro-trainer-burgundy"),
   ].filter(Boolean) as Product[];
 
+  // Shop-by-brand showcase — one iconic cutout per brand (incl. UGG & North Face).
+  const pick = (cat: string, ...slugs: string[]): Product | undefined =>
+    (slugs.map(s => all.find(p => p.slug === s)).find(Boolean)) || all.find(p => p.category === cat);
+  const brands = [
+    { name: "Converse", labelKey: "cat.Converse", href: "/shop?category=Converse", p: pick("Converse", "converse-chuck70-hi-black") },
+    { name: "New Balance", labelKey: "cat.New Balance", href: "/shop?category=New%20Balance", p: pick("New Balance", "nb-1906a-silver") },
+    { name: "UGG", labelKey: "cat.UGG", href: "/shop?category=UGG", p: pick("UGG", "ugg-ultra-mini-chestnut", "ugg-classic-mini-chestnut") },
+    { name: "The North Face", labelKey: "cat.The North Face", href: "/shop?category=The%20North%20Face", p: pick("The North Face", "tnf-nuptse-orange-black", "tnf-nuptse-charcoal-black") },
+  ].filter(b => b.p) as { name: string; labelKey: string; href: string; p: Product }[];
+
   const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://xmas.mn").replace(/\/$/, "");
   const structuredData = [
     { "@context": "https://schema.org", "@type": "Organization", name: "X-MAS", url: SITE, logo: `${SITE}/icon.svg` },
@@ -65,6 +75,19 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
           <h2 className="text-center font-display text-[18px] sm:text-[22px] uppercase tracking-[.06em] text-ink">{t("home.trusted")}</h2>
           <div className="mt-4"><BrandMarquee /></div>
         </section>
+
+        {/* ===== SHOP BY BRAND ===== */}
+        {brands.length > 0 && (
+        <section className={`${wrap} mt-14 sm:mt-20`}>
+          <Reveal>
+            <div className="text-[11px] uppercase tracking-[.22em] font-semibold text-accent">{t("home.brands")}</div>
+            <h2 className="hd-2 mt-1">{t("home.brandsSub")}</h2>
+          </Reveal>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+            {brands.map((b, i) => <BrandCard key={b.name} brand={b} t={t} delay={i * 0.06} />)}
+          </div>
+        </section>
+        )}
 
         {/* ===== TRENDING ===== */}
         <section className={`${wrap} mt-14 sm:mt-20`}>
@@ -237,6 +260,36 @@ function FeatureCard({ img, title, desc, small }: { img?: string; title: string;
         <p className="text-white/65 text-[12.5px] mt-1 leading-snug">{desc}</p>
       </div>
     </div>
+  );
+}
+
+function BrandCard({ brand, t, delay }: { brand: { name: string; labelKey: string; href: string; p: Product }; t: (k: string) => string; delay?: number }) {
+  const img = brand.p.image;
+  const isCutout = (img ?? "").endsWith(".png");
+  return (
+    <Reveal blur delay={delay}>
+      <Link href={brand.href} className="group relative block overflow-hidden rounded-[1.4rem] min-h-[240px] sm:min-h-[270px] card-dark">
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-accent/20 blur-3xl" />
+        {img && (
+          <div className={`absolute ${isCutout ? "inset-x-3 top-4 bottom-16" : "inset-0"}`}>
+            {isCutout ? (
+              <Parallax amount={14} className="relative w-full h-full">
+                <Photo src={img} alt={brand.name} imgClassName="object-contain drop-shadow-[0_22px_28px_rgba(0,0,0,.55)] transition-transform duration-700 ease-elegant group-hover:scale-105" />
+              </Parallax>
+            ) : (
+              <Photo src={img} alt={brand.name} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-105" />
+            )}
+          </div>
+        )}
+        {!isCutout && <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />}
+        <div className="absolute left-5 bottom-5 right-5 flex items-end justify-between text-white">
+          <h3 className="font-display uppercase tracking-[.03em] text-[17px] sm:text-[19px] leading-none">{t(brand.labelKey)}</h3>
+          <span className="w-9 h-9 rounded-full bg-white/15 backdrop-blur grid place-items-center group-hover:bg-accent transition-colors">
+            <ArrowUpRight width={14} height={14} />
+          </span>
+        </div>
+      </Link>
+    </Reveal>
   );
 }
 

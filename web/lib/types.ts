@@ -1,8 +1,13 @@
-// X-MAS — multi-brand sneaker store. `Category` is the sneaker brand (taxonomy
+// X-MAS — multi-brand sneaker + winter store. `Category` is the brand (taxonomy
 // lives in Medusa); `Shape` is the silhouette used by the fallback SVG visual.
-export type Category = "Converse" | "New Balance";
+export type Category = "Converse" | "New Balance" | "UGG" | "The North Face";
 export type Shape =
-  | "runner" | "lowtop" | "hightop" | "chunky" | "skate" | "slide";
+  // sneakers (Converse / New Balance)
+  | "runner" | "lowtop" | "hightop" | "chunky" | "skate" | "slide"
+  // UGG footwear
+  | "boot" | "slipper" | "clog" | "sneaker"
+  // The North Face outerwear
+  | "jacket" | "parka";
 
 export type Product = {
   id: string;

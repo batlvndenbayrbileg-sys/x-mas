@@ -5,6 +5,7 @@ import { ENRICH, DEFAULT_ENRICH } from "./enrich";
 // (product categories), so this scales to a 10k+ catalog with no per-product map.
 const HANDLE_TO_CATEGORY: Record<string, Category> = {
   converse: "Converse", "new-balance": "New Balance",
+  ugg: "UGG", "the-north-face": "The North Face",
 };
 
 const URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";

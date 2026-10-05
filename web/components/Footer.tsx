@@ -46,7 +46,7 @@ export function Footer() {
             </div>
           </div>
 
-          <FootCol title={t("foot.brand")} links={[["/shop?category=Converse", t("cat.Converse")], ["/shop?category=New%20Balance", t("cat.New Balance")], ["/shop?filter=new", t("home.newArrivals")], ["/shop?filter=sale", t("nav.accessories")]]} />
+          <FootCol title={t("foot.brand")} links={[["/shop?category=Converse", t("cat.Converse")], ["/shop?category=New%20Balance", t("cat.New Balance")], ["/shop?category=UGG", t("cat.UGG")], ["/shop?category=The%20North%20Face", t("cat.The North Face")], ["/shop?filter=sale", t("nav.accessories")]]} />
           <FootCol title={t("foot.support")} links={[["/shop", t("bc.shop")], ["/refund-policy", t("foot.refund")], ["/terms", t("foot.terms")], ["/privacy", t("foot.privacy")]]} />
           <div>
             <h5 className="mb-4 text-[11px] font-semibold uppercase tracking-[.2em] text-accent">{t("foot.payments")}</h5>
