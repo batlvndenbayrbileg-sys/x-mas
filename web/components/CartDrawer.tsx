@@ -92,7 +92,7 @@ export function CartDrawer() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ type: "spring", stiffness: 420, damping: 38, delay: i * 0.04 }}
                         className="flex gap-3 items-center p-2.5 border-b border-line last:border-none">
-                      <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-graphite">
+                      <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-white border border-line">
                         <Photo src={it.image ?? productImg(it.id)} alt={it.name}
                           fallback={<div className="w-full h-full grid place-items-center card-dark"><ProductVisual product={{ shape: it.shape, accent: it.accent }} size="sm"/></div>}
                           imgClassName="w-full h-full object-cover"/>

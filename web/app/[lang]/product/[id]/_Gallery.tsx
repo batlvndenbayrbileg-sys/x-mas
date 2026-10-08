@@ -63,7 +63,7 @@ export function Gallery({ product, img }: { product: Product; img: string }) {
           {imgs.map((src, i) => (
             <button key={i} onClick={() => go(i)}
               aria-label={`${product.name} ${i + 1}`} aria-pressed={i === index}
-              className={`relative w-16 h-16 lg:w-20 lg:h-20 shrink-0 rounded-xl overflow-hidden bg-graphite cursor-pointer ring-2 transition-all duration-200 ease-elegant active:scale-95 ${i === index ? "ring-accent scale-[1.03]" : "ring-transparent hover:ring-ink/30 hover:scale-[1.03] opacity-80 hover:opacity-100"}`}>
+              className={`relative w-16 h-16 lg:w-20 lg:h-20 shrink-0 rounded-xl overflow-hidden bg-white border border-line cursor-pointer ring-2 transition-all duration-200 ease-elegant active:scale-95 ${i === index ? "ring-accent scale-[1.03]" : "ring-transparent hover:ring-ink/30 hover:scale-[1.03] opacity-80 hover:opacity-100"}`}>
               <Photo src={src} alt={product.name}
                 fallback={<div className="w-full h-full grid place-items-center card-dark"><ProductVisual product={product} size="sm"/></div>}
                 imgClassName="w-full h-full object-cover"/>
@@ -82,7 +82,7 @@ export function Gallery({ product, img }: { product: Product; img: string }) {
         onMouseMove={onMove}
         onClick={onClick}
         onKeyDown={onKeyDown}
-        className="group flex-1 rounded-[1.5rem] aspect-[4/5] sm:aspect-square overflow-hidden bg-graphite relative cursor-zoom-in outline-none"
+        className="group flex-1 rounded-[1.5rem] aspect-[4/5] sm:aspect-square overflow-hidden bg-white border border-line relative cursor-zoom-in outline-none"
       >
         <AnimatePresence initial={false} custom={dir}>
           <motion.div

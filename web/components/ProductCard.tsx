@@ -22,13 +22,12 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   const wished = mounted && has(product.id);
   const soldOut = product.stock === 0;
   const t = useT();
-  // Transparent PNG cutouts sit on a light tile with object-contain; promo-card
-  // JPGs fill a dark tile with object-cover.
+  // Every product sits on a white tile: transparent PNG cutouts are letterboxed
+  // with object-contain, promo-card JPGs fill it with object-cover.
   const isCutout = (product.image ?? "").endsWith(".png");
 
   const fallback = (
-    <div className="absolute inset-0 grid place-items-center"
-         style={{ background: "linear-gradient(165deg,#2A2C2F 0%,#161719 60%,#0A0B0C 100%)" }}>
+    <div className="absolute inset-0 grid place-items-center bg-white">
       <ProductVisual product={product} size="md"/>
     </div>
   );
@@ -43,7 +42,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     >
       <Link href={`/product/${product.slug}`} className="group block">
         {/* Image — kept clean; controls overlay, product info sits below */}
-        <div className={`relative overflow-hidden rounded-[1.4rem] aspect-[4/5] transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep ${isCutout ? "bg-mist border border-line" : "bg-graphite"}`}>
+        <div className="relative overflow-hidden rounded-[1.4rem] aspect-[4/5] bg-white border border-line transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep">
           <Photo
             src={product.image ?? productImg(product.id)}
             alt={product.name}
@@ -53,22 +52,22 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               isCutout ? "object-contain p-3" : "object-cover"
             }`}
           />
-          <div className={`absolute inset-0 ${isCutout ? "" : "bg-gradient-to-t from-black/25 via-transparent to-black/5"} ${soldOut ? "backdrop-grayscale" : ""}`}/>
+          <div className={`absolute inset-0 pointer-events-none ${soldOut ? "backdrop-grayscale" : ""}`}/>
 
           {/* badge */}
           {soldOut ? (
             <span className="absolute top-3 left-3 z-10 text-[10px] uppercase tracking-[.14em] font-semibold px-2.5 h-6 rounded-pill grid place-items-center bg-ink text-white">{t("common.soldOut")}</span>
           ) : product.badge && (
             <span className={`absolute top-3 left-3 z-10 text-[10px] uppercase tracking-[.14em] font-semibold px-2.5 h-6 rounded-pill grid place-items-center ${
-              product.badge === "New" ? "bg-accent text-ink" : "bg-white/90 text-ink"
+              product.badge === "New" ? "bg-accent text-white" : "bg-ink text-white"
             }`}>{product.badge}</span>
           )}
 
           {/* wishlist */}
           <button
             onClick={(e) => { e.preventDefault(); toggleWish(product.id); }}
-            className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full grid place-items-center backdrop-blur transition-all duration-200 ease-elegant active:scale-90 ${
-              wished ? "text-red-500 bg-white scale-105" : "text-ink bg-white/85 hover:bg-white hover:scale-105"
+            className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full grid place-items-center border shadow-soft transition-all duration-200 ease-elegant active:scale-90 ${
+              wished ? "text-red-500 bg-white border-red-200 scale-105" : "text-ink/70 bg-white border-line hover:text-accent hover:border-accent/40 hover:scale-105"
             }`}
             aria-label={`${t("nav.wishlist")}: ${product.name}`}
             aria-pressed={wished}
@@ -83,7 +82,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               aria-label={`${t("common.quickView")}: ${product.name}`}
               className="hidden lg:flex absolute inset-x-0 top-1/2 -translate-y-1/2 z-10 justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-elegant"
             >
-              <span className="bg-white/90 backdrop-blur text-ink text-[12px] font-semibold uppercase tracking-wide px-4 h-9 rounded-pill grid place-items-center shadow-soft hover:bg-white active:scale-95 transition-transform">
+              <span className="bg-white border border-line text-ink text-[12px] font-semibold uppercase tracking-wide px-4 h-9 rounded-pill grid place-items-center shadow-deep hover:border-ink/30 active:scale-95 transition-transform">
                 {t("common.quickView")}
               </span>
             </button>

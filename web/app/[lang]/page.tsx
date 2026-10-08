@@ -6,15 +6,16 @@ import type { Product } from "@/lib/types";
 import { Photo } from "@/components/Photo";
 import { ArrowUpRight, ArrowRight } from "@/components/Icons";
 import { api, money } from "@/lib/api";
-import { NewsletterForm } from "./_components/NewsletterForm";
 import { Reveal } from "./_components/Reveal";
 import { HeroKick } from "./_components/HeroKick";
 import { Countdown } from "./_components/Countdown";
 import { BrandMarquee } from "./_components/BrandMarquee";
+import { TrendingSection } from "./_components/TrendingSection";
 import { Testimonials3D } from "./_components/Testimonials3D";
 import { Parallax } from "./_components/Parallax";
 import { ScrollProgress } from "./_components/ScrollProgress";
 import { CoverflowCarousel } from "@/components/ui/coverflow-carousel";
+import ViewfinderFlipCarousel from "@/components/ui/viewfinder-flip-carousel";
 import { tFor, type Lang } from "@/lib/i18n";
 
 export const revalidate = 300;
@@ -24,20 +25,33 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
   const res = await api.products.list({}).catch(() => ({ data: [] as Product[] }));
   const all = res.data;
 
-  const trendFeatured = all.find(p => p.slug === "converse-suede-low-black") || all.find(p => p.badge === "Sale") || all[0];
-  const trending = all.filter(p => p.id !== trendFeatured?.id).slice(0, 4);
+  // Trending shows transparent cutouts only: the legacy Converse promo-card JPGs
+  // have the logo and price burned into the artwork, which double-prints next to
+  // the card's own price. Cutouts keep the grid clean (and cover every brand).
+  const cutouts = all.filter(p => (p.image ?? "").endsWith(".png"));
+  const trendFeatured = cutouts.find(p => p.slug === "converse-suede-low-black") || cutouts[0] || all[0];
+  // Pool of 15 → three pages of (1 featured + 4) behind the ‹ › pager.
+  const trendPool = [trendFeatured, ...cutouts.filter(p => p.id !== trendFeatured?.id)]
+    .filter(Boolean).slice(0, 15) as Product[];
+  // Spotlight flip-carousel: a brand-balanced set of cutouts.
+  const spotlight = [
+    ...cutouts.filter(p => p.category === "Converse").slice(0, 4),
+    ...cutouts.filter(p => p.category === "UGG").slice(0, 3),
+    ...cutouts.filter(p => p.category === "The North Face").slice(0, 3),
+  ];
   const vibe = all.slice(6, 14);
   const newArrivals = [all.find(p => p.slug === "converse-chuck-low-black-stars"), ...all.filter(p => p.badge === "New"), ...all].filter(Boolean).filter((p, i, a) => a.findIndex(x => x!.id === p!.id) === i).slice(0, 5) as Product[];
   const hiTops = all.filter(p => p.shape === "hightop").slice(0, 4);
   const lowTops = all.filter(p => p.shape === "lowtop").slice(0, 4);
   const nb = all.filter(p => p.category === "New Balance");
   const limited = nb[0] || all[0];
-  // Prefer transparent cutouts (clean floating shoe) for the hero.
+  // Hero rotator — one clean cutout per brand so the hero shows the full range
+  // (sneaker · boot · jacket), not just sneakers.
   const heroSet = [
     all.find(p => p.slug === "converse-chuck70-hi-black"),
+    all.find(p => p.slug === "ugg-ultra-mini-chestnut"),
+    all.find(p => p.slug === "tnf-nuptse-orange-black"),
     all.find(p => p.slug === "converse-chuck-low-blue-check"),
-    all.find(p => p.slug === "converse-star-player-burgundy"),
-    all.find(p => p.slug === "converse-retro-trainer-burgundy"),
   ].filter(Boolean) as Product[];
 
   // Shop-by-brand showcase — one iconic cutout per brand (incl. UGG & North Face).
@@ -91,13 +105,9 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
 
         {/* ===== TRENDING ===== */}
         <section className={`${wrap} mt-14 sm:mt-20`}>
-          <SectionHead title={t("home.trending")} href="/shop" cta={t("common.seeAll")} />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 mt-6">
-            {trendFeatured && <Reveal blur><FeaturedCard product={trendFeatured} t={t} /></Reveal>}
-            <div className="grid grid-cols-2 gap-4 sm:gap-5">
-              {trending.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
-            </div>
-          </div>
+          <Reveal blur>
+            <TrendingSection products={trendPool} title={t("home.trending")} seeAll={t("common.seeAll")} />
+          </Reveal>
         </section>
 
         {/* ===== PRODUCT FEATURES ===== */}
@@ -107,15 +117,42 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
             <p className="text-muted mt-1">{t("home.featuresSub")}</p>
           </Reveal>
           <Reveal blur className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-            <FeatureCard img={all.find(p=>p.slug==="converse-chuck-low-blue-check")?.image} title={t("home.feat1")} desc={t("home.feat1d")} />
-            <FeatureCard img={all.find(p=>p.slug==="converse-star-player-burgundy")?.image} title={t("home.feat3")} desc={t("home.feat3d")} />
+            {/* artwork is paired to the claim: bold colourway, then rubber outsole */}
+            <FeatureCard tint="from-[#24262b] to-[#0b0c0d]" img={pick("The North Face", "tnf-nuptse-orange-black")?.image} title={t("home.feat1")} desc={t("home.feat1d")} />
+            <FeatureCard tint="from-[#1d3a2f] to-[#0a1510]" img={all.find(p=>p.slug==="converse-chuck70-hi-black")?.image} title={t("home.feat3")} desc={t("home.feat3d")} />
           </Reveal>
           <Reveal blur delay={0.08} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-            <FeatureCard img={all.find(p=>p.slug==="converse-chuck70-hi-black")?.image} title={t("home.feat2")} desc={t("home.feat2d")} small />
-            <FeatureCard img={all.find(p=>p.slug==="converse-retro-trainer-burgundy")?.image} title={t("home.feat4")} desc={t("home.feat4d")} small />
-            <FeatureCard img={all.find(p=>p.slug==="converse-chuck-low-black-stars")?.image} title={t("home.feat5")} desc={t("home.feat5d")} small />
+            <FeatureCard tint="from-[#17222e] to-[#090d12]" img={pick("UGG", "ugg-classic-mini-chestnut")?.image} title={t("home.feat2")} desc={t("home.feat2d")} small />
+            <FeatureCard tint="from-[#2a1a22] to-[#120a0e]" img={pick("UGG", "ugg-tasman-chestnut")?.image} title={t("home.feat4")} desc={t("home.feat4d")} small />
+            <FeatureCard tint="from-[#2a2017] to-[#120d08]" img={all.find(p=>p.slug==="converse-chuck-low-blue-check")?.image} title={t("home.feat5")} desc={t("home.feat5d")} small />
           </Reveal>
         </section>
+
+        {/* ===== SPOTLIGHT (viewfinder flip) ===== */}
+        {spotlight.length > 2 && (
+        <section className={`${wrap} mt-16 sm:mt-24`}>
+          <Reveal>
+            <h2 className="hd-2">{t("home.spotlight")}</h2>
+            <p className="text-muted mt-1">{t("home.spotlightSub")}</p>
+          </Reveal>
+          <Reveal blur className="mt-6 rounded-[2rem] border border-line bg-white overflow-hidden">
+            <ViewfinderFlipCarousel
+              items={spotlight.map(p => ({ title: p.name, src: p.image, alt: p.name }))}
+              height="520px"
+              size={230}
+              openWidth={330}
+              foldedWidth={62}
+              radius={16}
+              titles
+              background="transparent"
+              color="#161515"
+              fontFamily="inherit"
+              defaultIndex={Math.min(3, spotlight.length - 1)}
+              ariaLabel={t("home.spotlight")}
+            />
+          </Reveal>
+        </section>
+        )}
 
         {/* ===== CHOOSE YOUR VIBE (coverflow) ===== */}
         <section className="mt-16 sm:mt-24">
@@ -184,17 +221,6 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
         </section>
         )}
 
-        {/* ===== NEWSLETTER ===== */}
-        <section className={`${wrap} mt-16 sm:mt-24 mb-6`}>
-          <Reveal blur>
-          <div className="relative overflow-hidden rounded-[2rem] bg-accent-soft border border-accent/20 p-8 sm:p-12 text-center">
-            <span className="text-[11px] uppercase tracking-[.24em] font-semibold text-accent-deep">{t("home.newsKicker")}</span>
-            <h2 className="hd-2 mt-2 text-ink">{t("home.newsTitle")}</h2>
-            <p className="text-ink/65 mt-2 max-w-[440px] mx-auto">{t("home.newsDesc")}</p>
-            <div className="mt-6 max-w-[440px] mx-auto"><NewsletterForm /></div>
-          </div>
-          </Reveal>
-        </section>
       </div>
 
       <Footer />
@@ -234,30 +260,35 @@ function FeaturedCard({ product, t, drop }: { product: Product; t: (k:string)=>s
   );
 }
 
-function FeatureCard({ img, title, desc, small }: { img?: string; title: string; desc: string; small?: boolean }) {
+function FeatureCard({ img, title, desc, small, tint = "from-[#1b1c1f] to-[#0a0b0c]" }: {
+  img?: string; title: string; desc: string; small?: boolean; tint?: string;
+}) {
   const isCutout = (img ?? "").endsWith(".png");
   return (
-    <div className={`group relative overflow-hidden rounded-[1.4rem] ${small ? "min-h-[200px]" : "min-h-[240px]"} card-dark`}>
+    <div className={`group relative overflow-hidden rounded-[1.4rem] border border-white/5 bg-gradient-to-br ${tint} ${small ? "min-h-[230px]" : "min-h-[280px]"}`}>
       {/* soft accent glow top-right */}
-      <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-accent/20 blur-3xl" />
+      <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-accent/25 blur-3xl" />
       {img && (
-        <div className={`absolute ${isCutout ? "inset-x-2 top-2 bottom-16" : "inset-0"}`}>
+        <div className={`absolute ${isCutout ? "inset-x-4 top-4 bottom-[4.5rem]" : "inset-0"}`}>
           {isCutout ? (
             <Parallax amount={16} className="relative w-full h-full">
-              <Photo src={img} alt={title} imgClassName="object-contain drop-shadow-[0_20px_24px_rgba(0,0,0,.5)] transition-transform duration-700 ease-elegant group-hover:scale-105" />
+              <Photo src={img} alt={title} imgClassName="object-contain drop-shadow-[0_22px_28px_rgba(0,0,0,.6)] transition-transform duration-700 ease-elegant group-hover:scale-[1.07]" />
             </Parallax>
           ) : (
-            <Photo src={img} alt={title} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-105" />
+            <Photo src={img} alt={title} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-[1.07]" />
           )}
         </div>
       )}
-      {!isCutout && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />}
+      {/* scrim keeps the caption readable over any artwork */}
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
       <div className="absolute left-5 bottom-5 right-5 text-white">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-          <h3 className="font-display uppercase tracking-[.03em] text-[16px]">{title}</h3>
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded-full bg-accent/20 border border-accent/50 grid place-items-center shrink-0 transition-colors duration-300 group-hover:bg-accent/35">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+          </span>
+          <h3 className="font-display uppercase tracking-[.03em] text-[15px] sm:text-[17px]">{title}</h3>
         </div>
-        <p className="text-white/65 text-[12.5px] mt-1 leading-snug">{desc}</p>
+        <p className="text-white/70 text-[12.5px] mt-1.5 leading-snug">{desc}</p>
       </div>
     </div>
   );
@@ -277,7 +308,9 @@ function BrandCard({ brand, t, delay }: { brand: { name: string; labelKey: strin
                 <Photo src={img} alt={brand.name} imgClassName="object-contain drop-shadow-[0_22px_28px_rgba(0,0,0,.55)] transition-transform duration-700 ease-elegant group-hover:scale-105" />
               </Parallax>
             ) : (
-              <Photo src={img} alt={brand.name} imgClassName="object-cover transition-transform duration-700 ease-elegant group-hover:scale-105" />
+              // No cutout for this brand — zoom into the promo card so its
+              // burned-in wordmark and price crop out of frame.
+              <Photo src={img} alt={brand.name} imgClassName="object-cover scale-[1.75] transition-transform duration-700 ease-elegant group-hover:scale-[1.85]" />
             )}
           </div>
         )}

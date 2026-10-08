@@ -19,8 +19,8 @@ export function generateMetadata({ params }: { params: { lang: Lang } }): Metada
   const t = tFor(params.lang);
   const title = `${t("shop.titleAccent")} — X-MAS`;
   const description = params.lang === "mn"
-    ? "X-MAS дэлгүүрийн бүх пүүз — Nike, Adidas, New Balance, Puma, Converse. 100% оригинал, QPay-ээр төлнө."
-    : "Browse all X-MAS sneakers — Nike, Adidas, New Balance, Puma, Converse. 100% authentic, pay with QPay.";
+    ? "X-MAS дэлгүүрийн бүх бараа — Converse, New Balance, UGG, The North Face. Пүүз, гутал, куртик. 100% оригинал, QPay-ээр төлнө."
+    : "Browse all X-MAS products — Converse, New Balance, UGG & The North Face. Sneakers, boots & down jackets. 100% authentic, pay with QPay.";
   const url = `${SITE}/${params.lang}/shop`;
   return {
     title,

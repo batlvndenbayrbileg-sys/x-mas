@@ -94,7 +94,7 @@ export function QuickViewModal() {
               className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full grid place-items-center bg-white/85 backdrop-blur hover:bg-white shadow-soft text-xl leading-none">×</button>
 
             {/* Image */}
-            <div className="relative bg-graphite aspect-[4/5] sm:aspect-auto sm:min-h-[420px]">
+            <div className="relative bg-white border-b sm:border-b-0 sm:border-r border-line aspect-[4/5] sm:aspect-auto sm:min-h-[420px]">
               <Photo src={img} alt={product.name}
                 fallback={<div className="absolute inset-0 grid place-items-center card-dark"><ProductVisual product={product} size="lg"/></div>}
                 imgClassName="absolute inset-0 w-full h-full object-cover"/>

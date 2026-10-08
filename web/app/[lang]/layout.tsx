@@ -14,11 +14,11 @@ import { LOCALES, isLang, tFor } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://xmas.mn"),
-  title: "X-MAS — Оригинал пүүз, нэг дороос",
-  description: "Nike, Adidas, New Balance, Puma, Converse — оригинал пүүз нэг дороос. QPay-ээр төлж, хурдан хүргүүлээрэй.",
+  title: "X-MAS — Оригинал пүүз, гутал, куртик",
+  description: "Converse, New Balance, UGG, The North Face — оригинал пүүз, гутал, куртик нэг дороос. QPay-ээр төлж, хурдан хүргүүлээрэй.",
   openGraph: {
-    title: "X-MAS — Оригинал пүүз, нэг дороос",
-    description: "Nike, Adidas, New Balance, Puma, Converse — оригинал пүүз нэг дороос.",
+    title: "X-MAS — Оригинал пүүз, гутал, куртик",
+    description: "Converse, New Balance, UGG, The North Face — оригинал пүүз, гутал, куртик нэг дороос.",
     type: "website",
     siteName: "X-MAS",
   },
