@@ -8,9 +8,9 @@ This project has now been rewired to be a fully independent store.
 
 | Concern | Beauty store (original) | X-MAS (this folder) |
 |---|---|---|
-| Postgres DB | `vexo_store` | **`xmas_store`** |
+| Postgres | `vexo_store` on **:5433** | **`xmas_store` on :5434** |
 | Redis logical DB | `redis://…:6379` (0) | **`…:6379/1`** |
-| Meili index | `products` | **`xmas_products`** (`MEILI_INDEX`) |
+| MeiliSearch | `products` on **:7700** | **`xmas_products` on :7701**, own master key |
 | Medusa port | 9000 | **9001** |
 | Web port | 3000 | **3002** |
 | Express API port | 4000 | **4001** |
@@ -25,7 +25,7 @@ Files changed: `medusa-backend/apps/backend/.env`, `medusa-config.ts` (index UID
 
 ## First-time setup (local)
 
-Postgres (:5433) + Redis (:6379) must be running, then from the project root:
+Postgres (:5434) + Redis (:6379) must be running, then from the project root:
 
 ```bash
 bash scripts/setup-xmas.sh
@@ -57,3 +57,14 @@ isolated automatically — just set the same env vars there:
 - `STORE_CORS` / `ADMIN_CORS` / `AUTH_CORS` → the X-MAS domain (e.g. `https://xmas.mn`)
 - fresh `JWT_SECRET` / `COOKIE_SECRET`
 - Botxon/QPay: use X-MAS's own merchant credentials and point its webhook at the X-MAS API.
+
+## MeiliSearch (X-MAS's own instance)
+
+The beauty store runs MeiliSearch on :7700. X-MAS has its own on **:7701** with its
+own master key, so neither store can read or write the other's index:
+
+```bash
+meilisearch --http-addr 127.0.0.1:7701 --master-key "$(grep '^MEILISEARCH_API_KEY=' medusa-backend/apps/backend/.env | cut -d= -f2)"
+```
+
+Medusa boots fine without it — the search plugin just stays disabled.

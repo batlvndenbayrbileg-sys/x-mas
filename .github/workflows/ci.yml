@@ -32,7 +32,7 @@ jobs:
           NEXT_PUBLIC_MEDUSA_URL: https://example.invalid
           NEXT_PUBLIC_MEDUSA_PK: pk_ci_placeholder
           NEXT_PUBLIC_MEDUSA_REGION: reg_ci_placeholder
-          NEXT_PUBLIC_SITE_URL: https://naran.mn
+          NEXT_PUBLIC_SITE_URL: https://xmas.mn
 
   medusa:
     name: Medusa backend (test + build)
@@ -41,7 +41,7 @@ jobs:
       run:
         working-directory: medusa-backend/apps/backend
     services:
-      # Matches medusa-backend/apps/backend/.env.test (localhost:5433, vexo/vexo).
+      # Matches medusa-backend/apps/backend/.env.test (localhost:5434, vexo/vexo).
       # Port mapped to 5433 so the same test env works locally and in CI. The
       # POSTGRES_USER is a superuser, so pg-god can create per-run test DBs.
       postgres:
@@ -49,9 +49,9 @@ jobs:
         env:
           POSTGRES_USER: vexo
           POSTGRES_PASSWORD: vexo
-          POSTGRES_DB: vexo_store
+          POSTGRES_DB: xmas_store
         ports:
-          - 5433:5432
+          - 5434:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
