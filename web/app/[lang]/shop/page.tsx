@@ -6,6 +6,7 @@ import { ArrowRight, SearchIcon } from "@/components/Icons";
 import { api } from "@/lib/api";
 import { tFor, type Lang } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
+import { TYPES, typeOf, isType, type ProductType } from "@/lib/taxonomy";
 import { SortSelect, ShopFilters } from "./_ShopControls";
 import { Reveal } from "@/app/[lang]/_components/Reveal";
 import type { Metadata } from "next";
@@ -15,12 +16,15 @@ export const dynamic = "force-dynamic";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "https://xmas.mn").replace(/\/$/, "");
 
-export function generateMetadata({ params }: { params: { lang: Lang } }): Metadata {
+export function generateMetadata(
+  { params, searchParams }: { params: { lang: Lang }; searchParams: { type?: string } },
+): Metadata {
   const t = tFor(params.lang);
-  const title = `${t("shop.titleAccent")} — X-MAS`;
+  const type = isType(searchParams.type) ? searchParams.type : undefined;
+  const title = `${type ? t(`type.${type}`) : t("shop.titleAll")} — X-MAS`;
   const description = params.lang === "mn"
-    ? "X-MAS дэлгүүрийн бүх бараа — Converse, New Balance, UGG, The North Face. Пүүз, гутал, куртик. 100% оригинал, QPay-ээр төлнө."
-    : "Browse all X-MAS products — Converse, New Balance, UGG & The North Face. Sneakers, boots & down jackets. 100% authentic, pay with QPay.";
+    ? "X-MAS дэлгүүрийн бүх бараа — Converse, UGG, The North Face. Пүүз, гутал, куртик. 100% оригинал, QPay-ээр төлнө."
+    : "Browse all X-MAS products — Converse, UGG & The North Face. Sneakers, boots & down jackets. 100% authentic, pay with QPay.";
   const url = `${SITE}/${params.lang}/shop`;
   return {
     title,
@@ -30,12 +34,12 @@ export function generateMetadata({ params }: { params: { lang: Lang } }): Metada
   };
 }
 
-const cats = ["all", "Converse", "New Balance", "UGG", "The North Face"];
+const cats = ["all", "Converse", "UGG", "The North Face"];
 
 export default async function ShopPage({
   params,
   searchParams,
-}: { params: { lang: Lang }; searchParams: { category?: string; sort?: string; q?: string; gender?: string; filter?: string; color?: string; tech?: string; minPrice?: string; maxPrice?: string } }) {
+}: { params: { lang: Lang }; searchParams: { category?: string; sort?: string; q?: string; gender?: string; filter?: string; color?: string; tech?: string; minPrice?: string; maxPrice?: string; type?: string } }) {
   const t = tFor(params.lang);
   // Resilient: a catalog outage degrades to the empty state, never a 500.
   const [listRes, allForColors] = await Promise.all([
@@ -52,7 +56,22 @@ export default async function ShopPage({
     }).catch(() => ({ data: [] as Product[], total: 0 })),
     api.products.list({}).catch(() => ({ data: [] as Product[] })),
   ]);
-  const { data: products, total } = listRes;
+  const { data: all, total: allTotal } = listRes;
+
+  // The type axis is applied here rather than in the API layer: it is derived
+  // from each product's shape, which both backends already return.
+  const activeType = isType(searchParams.type) ? searchParams.type : undefined;
+  const products = activeType ? all.filter(p => typeOf(p) === activeType) : all;
+  const total = activeType ? products.length : allTotal;
+
+  // With nothing narrowed down, the page browses by type — two rows per section
+  // and a link through to the full list — instead of one undifferentiated grid.
+  const browsing = !activeType && !Object.entries(searchParams)
+    .some(([k, v]) => k !== "sort" && v);
+  const sections = browsing
+    ? TYPES.map(({ key }) => ({ key, items: products.filter(p => typeOf(p) === key) }))
+        .filter(s => s.items.length > 0)
+    : [];
   // Real swatches: unique product accents, so every colour chip yields results.
   const availableColors = Array.from(new Set(allForColors.data.map(p => p.accent)));
 
@@ -70,7 +89,10 @@ export default async function ShopPage({
                 <span className="text-ink uppercase">{t("bc.shop")}</span><span className="opacity-40 mx-1">·</span><span>{total} {t("shop.items")}</span>
               </div>
               <h1 className="font-display text-[34px] sm:text-[52px] tracking-tight leading-[.95] uppercase mt-3">
-                {t("shop.titlePre")} <span className="text-accent">{t("shop.titleAccent")}</span>
+                {t("shop.titlePre")}{" "}
+                <span className="text-accent">
+                  {activeType ? t(`type.${activeType}`) : t("shop.titleAll")}
+                </span>
               </h1>
             </Reveal>
           </header>
@@ -97,6 +119,17 @@ export default async function ShopPage({
             </div>
           </div>
 
+          {/* Active type, shown as a chip the shopper can drop */}
+          {activeType && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="inline-flex h-9 items-center gap-2 rounded-pill bg-ink pl-4 pr-1.5 text-[13px] font-medium text-white">
+                {t(`type.${activeType}`)}
+                <Link href="/shop" aria-label={t("shop.reset")}
+                  className="grid h-6 w-6 place-items-center rounded-full bg-white/15 text-[15px] leading-none transition-colors hover:bg-white/30">×</Link>
+              </span>
+            </div>
+          )}
+
           {/* Collapsible filters */}
           <ShopFilters colors={availableColors}/>
 
@@ -112,9 +145,15 @@ export default async function ShopPage({
             </Reveal>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
-                {products.map((p, i) => <ProductCard key={p.id} product={p} index={i}/>)}
-              </div>
+              {sections.length > 0 ? (
+                sections.map(({ key, items }) => (
+                  <TypeSection key={key} type={key} items={items} lang={params.lang} />
+                ))
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
+                  {products.map((p, i) => <ProductCard key={p.id} product={p} index={i}/>)}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -122,5 +161,34 @@ export default async function ShopPage({
 
       <Footer />
     </>
+  );
+}
+
+/** Two rows of one product type, with a way through to the rest of it. */
+function TypeSection({ type, items, lang }: { type: ProductType; items: Product[]; lang: Lang }) {
+  const t = tFor(lang);
+  // Two rows at the widest grid; narrower screens simply show more rows.
+  const PREVIEW = 8;
+  const shown = items.slice(0, PREVIEW);
+  const href = `/shop?type=${type}`;
+
+  return (
+    <section className="mt-10 first:mt-6">
+      <Reveal className="flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="font-display text-[22px] uppercase leading-none tracking-tight sm:text-[30px]">
+            {t(`type.${type}`)}
+          </h2>
+          <p className="mt-1.5 text-[12.5px] text-muted">{items.length} {t("shop.items")}</p>
+        </div>
+        <Link href={href} className="chip shrink-0">
+          {t("common.viewDetails")} <ArrowRight width={13} height={13} />
+        </Link>
+      </Reveal>
+
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+        {shown.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
+      </div>
+    </section>
   );
 }

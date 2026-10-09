@@ -1,9 +1,10 @@
 "use client";
 import { LocaleLink as Link } from "@/components/LocaleLink";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { SearchIcon, BagIcon, UserIcon, HeartIcon } from "./Icons";
+import { BagIcon, UserIcon, HeartIcon } from "./Icons";
+import { SearchBox } from "./SearchBox";
 import { useAuth, useCart, useWish, useUI } from "@/lib/store";
 import { useT, useLang } from "./LangProvider";
 import { LangToggle } from "./LangToggle";
@@ -35,7 +36,6 @@ function CountBadge({ count }: { count: number }) {
 
 export function Nav() {
   const pathname = usePathname();
-  const router = useRouter();
   const items = useCart(s => s.items);
   const wishIds = useWish(s => s.ids);
   const user = useAuth(s => s.user);
@@ -46,9 +46,6 @@ export function Nav() {
   const wishCount = mounted ? wishIds.length : 0;
   const t = useT();
   const lang = useLang();
-
-  const [q, setQ] = useState("");
-  useEffect(() => { setQ(new URLSearchParams(window.location.search).get("q") ?? ""); }, [pathname]);
 
   // Keyboard: Cmd/Ctrl+K or "/" focuses the visible search input.
   useEffect(() => {
@@ -66,12 +63,6 @@ export function Nav() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
-  function search(e: React.FormEvent) {
-    e.preventDefault();
-    const term = q.trim();
-    router.push(term ? `/${lang}/shop?q=${encodeURIComponent(term)}` : `/${lang}/shop`);
-  }
-
   const iconBtn = "relative w-11 h-11 rounded-full bg-white/70 border border-white/60 shadow-soft grid place-items-center text-ink hover:bg-white hover:-translate-y-px active:scale-90 transition-all duration-200 ease-elegant";
 
   const Wish = (
@@ -94,14 +85,18 @@ export function Nav() {
       <div className="lg:hidden flex items-center gap-2">
         <Link href="/" aria-label="X-MAS" className="shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpg" alt="X-MAS" className="h-9 w-auto object-contain" />
+          <img src="/logo.png" alt="X-MAS" className="h-10 w-auto object-contain" />
         </Link>
-        <form onSubmit={search} className="flex-1 min-w-0 h-11 bg-white/70 border border-white/60 shadow-soft rounded-pill flex items-center gap-2.5 px-4 backdrop-blur focus-within:bg-white transition">
-          <button type="submit" className="text-subtle hover:text-ink shrink-0 active:scale-90 transition" aria-label={t("nav.search")}><SearchIcon width={16} height={16}/></button>
-          <input value={q} onChange={e => setQ(e.target.value)} aria-label={t("nav.search")} data-search-input
-            className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-subtle min-w-0" placeholder={t("nav.searchShort")}/>
-          <Link href="/shop" className="text-subtle hover:text-ink shrink-0" aria-label={t("shop.filters")}><Sliders size={17}/></Link>
-        </form>
+        <div className="min-w-0 flex-1">
+          <SearchBox
+            iconSize={17}
+            className="flex h-11 items-center gap-2.5 rounded-pill border border-white/60 bg-white/70 px-4 shadow-soft backdrop-blur transition focus-within:bg-white"
+            inputClassName="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-subtle"
+            trailing={
+              <Link href="/shop" className="-mr-2 grid h-11 w-9 shrink-0 place-items-center text-subtle transition hover:text-ink" aria-label={t("shop.filters")}><Sliders size={18}/></Link>
+            }
+          />
+        </div>
         <LangToggle/>
         {Wish}
         {Bag}
@@ -112,26 +107,26 @@ export function Nav() {
           always has reserved space and can never be overlapped by the side
           content. Secondary links, search width and the account name scale down
           between lg and xl so nothing ever collides at tighter widths. */}
-      <nav className="hidden lg:grid grid-cols-[auto_1fr_auto] items-center gap-3 xl:gap-4 pl-3 xl:pl-4 pr-1 py-0.5">
+      <nav className="hidden lg:flex items-center gap-4 xl:gap-5 pl-4 pr-3 py-0.5">
+        <Link href="/" aria-label="X-MAS" className="group flex shrink-0 items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="X-MAS" className="h-14 xl:h-16 w-auto object-contain transition-transform duration-300 ease-spring group-hover:scale-105" />
+        </Link>
+
         <div className="flex items-center gap-5 xl:gap-6 min-w-0">
-          {[["/shop","nav.shop",true],["/shop?category=Converse","cat.Converse",false],["/shop?category=New%20Balance","cat.New Balance",false],["/shop?category=UGG","cat.UGG",false],["/shop?category=The%20North%20Face","cat.The North Face",false],["/shop?filter=sale","nav.accessories",false]].map(([h,k,pri]) => (
+          {[["/shop","nav.shop","inline-flex"],["/shop?category=Converse","cat.Converse","hidden xl:inline-flex"],["/shop?category=UGG","cat.UGG","hidden xl:inline-flex"],["/shop?category=The%20North%20Face","cat.The North Face","hidden 2xl:inline-flex"],["/shop?filter=sale","nav.accessories","hidden xl:inline-flex"]].map(([h,k,vis]) => (
             <Link key={k as string} href={h as string}
               aria-current={pathname === h ? "page" : undefined}
-              className={`relative whitespace-nowrap text-[12px] uppercase tracking-[.12em] font-medium transition-colors after:absolute after:left-0 after:-bottom-1.5 after:h-[1.5px] after:bg-accent after:transition-all after:duration-300 after:ease-elegant hover:after:w-full ${pri ? "inline-flex" : "hidden xl:inline-flex"} ${pathname===h?"text-ink after:w-full":"text-muted hover:text-ink after:w-0"}`}>{t(k as string)}</Link>
+              className={`relative whitespace-nowrap text-[12px] uppercase tracking-[.12em] font-medium transition-colors after:absolute after:left-0 after:-bottom-1.5 after:h-[1.5px] after:bg-accent after:transition-all after:duration-300 after:ease-elegant hover:after:w-full ${vis} ${pathname===h?"text-ink after:w-full":"text-muted hover:text-ink after:w-0"}`}>{t(k as string)}</Link>
           ))}
         </div>
 
-        <Link href="/" aria-label="X-MAS" className="group justify-self-center flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpg" alt="X-MAS" className="h-16 w-auto object-contain transition-transform duration-300 ease-spring group-hover:scale-105" />
-        </Link>
-
-        <div className="flex items-center gap-2 xl:gap-2.5 justify-self-end">
-          <form onSubmit={search} className="flex items-center gap-2.5 bg-surface-2 rounded-pill px-4 py-2.5 border border-transparent focus-within:border-line focus-within:bg-white transition-all duration-300 w-[150px] xl:w-[200px] focus-within:w-[210px] xl:focus-within:w-[260px]">
-            <button type="submit" className="text-subtle hover:text-ink shrink-0 active:scale-90 transition" aria-label={t("nav.search")}><SearchIcon width={16} height={16}/></button>
-            <input value={q} onChange={e => setQ(e.target.value)} aria-label={t("nav.search")} data-search-input
-              className="flex-1 bg-transparent outline-none text-sm placeholder:text-subtle min-w-0" placeholder={t("nav.searchShort")}/>
-          </form>
+        <div className="ml-auto flex items-center gap-2 xl:gap-2.5">
+          <SearchBox
+            className="flex w-[132px] items-center gap-2.5 rounded-pill border border-transparent bg-surface-2 px-4 py-2.5 transition-all duration-300 focus-within:w-[190px] focus-within:border-line focus-within:bg-white xl:w-[160px] xl:focus-within:w-[220px] 2xl:w-[200px] 2xl:focus-within:w-[260px]"
+            inputClassName="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-subtle"
+            panelClassName="min-w-[320px]"
+          />
           <LangToggle/>
           {Wish}
           {Bag}
@@ -140,6 +135,7 @@ export function Nav() {
             <span className="w-8 h-8 rounded-full bg-white/15 grid place-items-center transition-colors group-hover:bg-accent"><UserIcon width={15} height={15}/></span>
           </Link>
         </div>
+
       </nav>
      </div>
     </div>

@@ -5,7 +5,7 @@ import { Skeleton } from "./Skeleton";
 export function ProductCardSkeleton() {
   return (
     <div>
-      <Skeleton className="aspect-[4/5] rounded-[1.4rem]" />
+      <Skeleton className="aspect-[6/5] rounded-[1.4rem]" />
       <div className="mt-2.5 px-0.5 flex items-start justify-between gap-2">
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-3.5 w-3/4" />

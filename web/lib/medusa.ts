@@ -1,4 +1,4 @@
-import type { Category, Product, User } from "./types";
+import type { Category, Product, Review, ReviewSummary, User } from "./types";
 import { ENRICH, DEFAULT_ENRICH } from "./enrich";
 
 // Medusa category handle → storefront Category key. Taxonomy lives in Medusa
@@ -149,8 +149,6 @@ function map(m: any): Product {
     season: e.season,
     price,
     was: e.wasMultiplier ? Math.round(price * e.wasMultiplier) : undefined,
-    rating: e.rating,
-    reviews: e.reviews,
     badge: e.badge ?? null,
     colors: e.colors?.length ? e.colors : [e.accent],
     sizes,
@@ -239,7 +237,6 @@ export const medusa = {
       switch (sort) {
         case "price-asc": list.sort((a, b) => a.price - b.price); break;
         case "price-desc": list.sort((a, b) => b.price - a.price); break;
-        case "rating": list.sort((a, b) => b.rating - a.rating); break;
         case "new": list = list.filter(p => p.badge === "New").concat(list.filter(p => p.badge !== "New")); break;
       }
       return { data: list, total: list.length };
@@ -260,6 +257,43 @@ export const medusa = {
         : (await fetchProducts({ revalidate: PRODUCT_REVALIDATE })).products;
       const related = pool.filter(p => p.id !== product.id && p.category === product.category).slice(0, 4);
       return { data: product, related };
+    },
+  },
+
+  reviews: {
+    // Approved reviews for one product, with the aggregate the page displays.
+    forProduct: async (productId: string): Promise<ReviewSummary> => {
+      try {
+        const d = await mfetch(`reviews?product_id=${encodeURIComponent(productId)}`, 1, BROWSE_REVALIDATE);
+        return { rating: d.rating ?? null, count: d.count ?? 0, reviews: d.reviews ?? [] };
+      } catch {
+        // A review outage must never take the product page down.
+        return { rating: null, count: 0, reviews: [] };
+      }
+    },
+    // Newest approved reviews across the catalogue — the homepage wall.
+    latest: async (limit = 12): Promise<Review[]> => {
+      try {
+        const d = await mfetch(`reviews/latest?limit=${limit}`, 1, BROWSE_REVALIDATE);
+        return d.reviews ?? [];
+      } catch {
+        return [];
+      }
+    },
+    // Submit a review. Needs the customer's token; the review lands as pending
+    // and only appears once a moderator approves it.
+    create: async (
+      input: { product_id: string; rating: number; body: string; title?: string; name?: string },
+      token: string,
+    ) => {
+      const res = await fetch(`${URL}/store/reviews`, {
+        method: "POST",
+        headers: { ...H, authorization: `Bearer ${token}` },
+        body: JSON.stringify(input),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || `Medusa ${res.status}`);
+      return data as { review: Review; status: "pending" };
     },
   },
 

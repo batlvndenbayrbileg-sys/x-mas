@@ -76,7 +76,10 @@ if (meiliUp) {
 }
 
 // File storage: default local provider unless R2/S3 env is configured (VPS/prod).
-const modules: any[] = []
+const modules: any[] = [
+  // Customer product reviews (own table, moderated before they go public).
+  { resolve: "./src/modules/review" },
+]
 if (R2_ENDPOINT && R2_BUCKET) {
   modules.push({
     resolve: '@medusajs/medusa/file',

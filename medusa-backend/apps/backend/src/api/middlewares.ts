@@ -1,4 +1,4 @@
-import { defineMiddlewares, MedusaNextFunction, MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import { authenticate, defineMiddlewares, MedusaNextFunction, MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { Modules } from "@medusajs/framework/utils";
 import { canActor, Permission } from "../lib/rbac";
 import { rateLimit } from "../lib/rate-limit";
@@ -8,6 +8,9 @@ import { rateLimit } from "../lib/rate-limit";
 const loginLimit = rateLimit({ name: "auth-login", windowMs: 15 * 60_000, max: 10 });
 const registerLimit = rateLimit({ name: "auth-register", windowMs: 60 * 60_000, max: 10 });
 const resetLimit = rateLimit({ name: "auth-reset", windowMs: 15 * 60_000, max: 5 });
+// Review writes are cheap to spam, so cap them per client as well as per account
+// (the route itself already allows one review per customer per product).
+const reviewLimit = rateLimit({ name: "store-review", windowMs: 60 * 60_000, max: 12 });
 
 // RBAC guard (spec A0): enforce a permission on our custom /admin routes based on
 // the acting user's role (user.metadata.role). Role-less users are treated as
@@ -47,6 +50,18 @@ export default defineMiddlewares({
     { matcher: "/auth/:actor/emailpass", methods: ["POST"], middlewares: [loginLimit] },
     { matcher: "/auth/:actor/emailpass/register", methods: ["POST"], middlewares: [registerLimit] },
     { matcher: "/auth/:actor/emailpass/reset-password", methods: ["POST"], middlewares: [resetLimit] },
+
+    // --- Customer reviews ---
+    // Store POSTs need the customer on req.auth_context; GETs stay public, so
+    // authentication is optional here and the route itself rejects anonymous writes.
+    {
+      matcher: "/store/reviews",
+      methods: ["POST"],
+      middlewares: [reviewLimit, authenticate("customer", ["bearer", "session"], { allowUnauthenticated: true })],
+    },
+    // Moderation is content work — the marketer role already carries it.
+    { matcher: "/admin/reviews", methods: ["GET"], middlewares: [requirePermission("content.write")] },
+    { matcher: "/admin/reviews/*", methods: ["POST", "DELETE"], middlewares: [requirePermission("content.write")] },
 
     { matcher: "/admin/catalog/*", methods: ["GET"], middlewares: [requirePermission("catalog.read")] },
     { matcher: "/admin/catalog/*", methods: ["POST"], middlewares: [requirePermission("catalog.write")] },

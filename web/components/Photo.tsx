@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Product images fade + settle in as they decode, instead of popping. The single
 // inline transition covers BOTH opacity and transform, so a card's hover-zoom
@@ -26,12 +26,26 @@ export function Photo({
 }) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  // React's synthetic onLoad does not reliably fire for every <Image> (already
+  // decoded, or attached after the load event), which used to leave the image
+  // stuck at opacity 0. Listen natively as well, and keep a timeout as a last
+  // resort so a product shot is never left invisible.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el) return;
+    if (el.complete) { setLoaded(true); return; }
+    const show = () => setLoaded(true);
+    el.addEventListener("load", show);
+    const id = window.setTimeout(show, 1500);
+    return () => { el.removeEventListener("load", show); window.clearTimeout(id); };
+  }, [src]);
   if (!src || failed) return <>{fallback}</>;
   // Fade in on decode, but NEVER stay hidden: cached images can skip onLoad, so
   // a ref callback marks already-complete images visible immediately.
   return (
     <Image
-      ref={(el) => { if (el && el.complete) setLoaded(true); }}
+      ref={imgRef}
       src={src}
       alt={alt}
       fill

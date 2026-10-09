@@ -1,54 +1,85 @@
 "use client";
 import { Marquee } from "@/components/ui/3d-testimonials";
+import { LocaleLink as Link } from "@/components/LocaleLink";
+import { Stars } from "@/components/Stars";
+import { useT } from "@/components/LangProvider";
+import type { Review } from "@/lib/types";
 
-type Review = { name: string; username: string; body: string; img: string; country: string };
-
-const REVIEWS: Review[] = [
-  { name: "Ayaan M.", username: "@ayaan", body: "Best sneakers I've owned. Comfy, stylish and my everyday go-to.", img: "https://cdn.21st.dev/assets/mirror/55/55cf6231499bcdc496f15ff1d28d4170ac9b99e9279495caa44fca70886d8b2e.jpg", country: "🇲🇳 MN" },
-  { name: "Tuya B.", username: "@tuya", body: "True to size and box-fresh. I get compliments every time.", img: "https://cdn.21st.dev/assets/mirror/f0/f07b84f12ef125cbb837a7bd64da401992f5f62bd55fee10d01cd3dcc8abae80.jpg", country: "🇲🇳 MN" },
-  { name: "Leo R.", username: "@leo", body: "Premium and 100% authentic. X-MAS nailed it — fast delivery too.", img: "https://cdn.21st.dev/assets/mirror/7c/7c0d2aa99715b15c218385f5679347782843c02f939d8eee6f9cb1cad6ba6ed0.jpg", country: "🇲🇳 MN" },
-  { name: "Sara K.", username: "@sara", body: "The Chuck 70 fit is perfect. Quality speaks for itself.", img: "https://cdn.21st.dev/assets/mirror/f8/f8f2ddc445b6b2318430260bdebb665c9415865827230565aa42f57c9c794baf.jpg", country: "🇲🇳 MN" },
-  { name: "Bilguun", username: "@bilg", body: "Grabbed the 1906A on sale — insane value. Super comfy.", img: "https://cdn.21st.dev/assets/mirror/ae/ae1d49872fdd6f8d9aa933f6ca8bce8cb1ba7e87dfb9d2926661184cb7bfe26d.jpg", country: "🇲🇳 MN" },
-  { name: "Maral", username: "@maral", body: "Love the colourways. My One Star suede is unreal.", img: "https://cdn.21st.dev/assets/mirror/9a/9aac54d62e727561f6958213b8a3649230a3bba61ba5ddf63c69d3c6e4aecb0a.jpg", country: "🇲🇳 MN" },
-  { name: "Enkh", username: "@enkh", body: "Store staff helped me size right. Legit check passed.", img: "https://cdn.21st.dev/assets/mirror/e5/e55f3cdab57eb4084f7006cfe9f7f047e638e1b257a53498aaed14b83087152a.jpg", country: "🇲🇳 MN" },
-  { name: "Nomin", username: "@nomin", body: "Best sneaker spot in UB. Everyday go-to for kicks.", img: "https://cdn.21st.dev/assets/mirror/03/03410c155320ba33ecb8d798807c6c9610f33b2b2acdd4ed961a68185806df79.jpg", country: "🇲🇳 MN" },
-];
-
-function Card({ img, name, username, body, country }: Review) {
+/** Initials, not a stock photo — the person who wrote this is a real customer. */
+function Avatar({ name }: { name: string }) {
+  const initials = name.trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase() ?? "").join("");
   return (
-    <figure className="w-56 rounded-2xl border border-line bg-frost-deep p-4 shadow-soft">
-      <div className="flex items-center gap-2.5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={img} alt={name} className="h-9 w-9 rounded-full object-cover" />
-        <div className="flex flex-col">
-          <figcaption className="text-sm font-semibold text-ink flex items-center gap-1">{name} <span className="text-[11px]">{country}</span></figcaption>
-          <p className="text-[11px] text-muted">{username}</p>
-        </div>
-      </div>
-      <blockquote className="mt-3 text-[13px] leading-relaxed text-ink/75">{body}</blockquote>
-    </figure>
+    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-[12px] font-bold text-accent-deep">
+      {initials || "?"}
+    </span>
   );
 }
 
-export function Testimonials3D() {
+function Card({ review }: { review: Review }) {
+  const t = useT();
+  const card = (
+    <figure className="w-56 rounded-2xl border border-line bg-frost-deep p-4 shadow-soft transition-shadow hover:shadow-deep">
+      <div className="flex items-center gap-2.5">
+        <Avatar name={review.name} />
+        <div className="flex min-w-0 flex-col">
+          <figcaption className="truncate text-sm font-semibold text-ink">{review.name}</figcaption>
+          <Stars rating={review.rating} size={11} />
+        </div>
+      </div>
+      {review.title && <h3 className="mt-3 text-[13px] font-semibold text-ink">{review.title}</h3>}
+      <blockquote className={`line-clamp-5 text-[13px] leading-relaxed text-ink/75 ${review.title ? "mt-1" : "mt-3"}`}>
+        {review.body}
+      </blockquote>
+      {review.verified && (
+        <p className="mt-2.5 text-[10.5px] font-semibold uppercase tracking-[.08em] text-accent-deep">{t("rev.verified")}</p>
+      )}
+    </figure>
+  );
+  // The feed carries the product's handle, so a card doubles as a way in.
+  return review.product_handle
+    ? <Link href={`/product/${review.product_handle}`}>{card}</Link>
+    : card;
+}
+
+/**
+ * Wall of real, approved customer reviews. The caller only mounts this when
+ * there are reviews to show, so the homepage never carries invented praise.
+ * Column count scales with how many reviews exist — four thin columns of the
+ * same two reviews would read as padding.
+ */
+export function Testimonials3D({ reviews }: { reviews: Review[] }) {
+  if (!reviews.length) return null;
+
+  const columns = Math.min(4, Math.max(1, Math.ceil(reviews.length / 3)));
+  // Offset each column's starting point so the same card isn't level across the wall.
+  const lanes = Array.from({ length: columns }, (_, i) => {
+    const offset = Math.floor((reviews.length / columns) * i);
+    return [...reviews.slice(offset), ...reviews.slice(0, offset)];
+  });
+  // Durations go through the CSS variable rather than an arbitrary class:
+  // Tailwind only compiles class names it can see as literals in the source.
+  const speeds = ["38s", "44s", "40s", "46s"];
+  const visibility = ["", "", "hidden sm:flex", "hidden lg:flex"];
+
   return (
-    <div className="relative flex h-[420px] w-full flex-row items-center justify-center overflow-hidden gap-2 [perspective:320px]">
+    <div className="relative flex h-[420px] w-full flex-row items-center justify-center gap-2 overflow-hidden [perspective:320px]">
       <div
         className="flex flex-row items-center gap-4"
         style={{ transform: "translateX(-40px) translateZ(-90px) rotateX(18deg) rotateY(-8deg) rotateZ(18deg)" }}
       >
-        <Marquee vertical pauseOnHover repeat={3} className="[--duration:38s]">
-          {REVIEWS.map(r => <Card key={r.username} {...r} />)}
-        </Marquee>
-        <Marquee vertical pauseOnHover reverse repeat={3} className="[--duration:44s]">
-          {REVIEWS.map(r => <Card key={r.username} {...r} />)}
-        </Marquee>
-        <Marquee vertical pauseOnHover repeat={3} className="[--duration:40s] hidden sm:flex">
-          {REVIEWS.map(r => <Card key={r.username} {...r} />)}
-        </Marquee>
-        <Marquee vertical pauseOnHover reverse repeat={3} className="[--duration:46s] hidden lg:flex">
-          {REVIEWS.map(r => <Card key={r.username} {...r} />)}
-        </Marquee>
+        {lanes.map((lane, i) => (
+          <Marquee
+            key={i}
+            vertical
+            pauseOnHover
+            reverse={i % 2 === 1}
+            repeat={3}
+            style={{ ["--duration" as string]: speeds[i] } as React.CSSProperties}
+            className={visibility[i]}
+          >
+            {lane.map(r => <Card key={r.id} review={r} />)}
+          </Marquee>
+        ))}
       </div>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-frost to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-frost to-transparent" />

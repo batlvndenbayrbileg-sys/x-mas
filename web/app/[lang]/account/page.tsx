@@ -217,7 +217,7 @@ export default function AccountPage() {
             {tab === "Wishlist" && (
               loadingProducts ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                  {[0, 1, 2, 3].map(i => <Skeleton key={i} className="aspect-[4/5] rounded-[1.4rem]"/>)}
+                  {[0, 1, 2, 3].map(i => <Skeleton key={i} className="aspect-[6/5] rounded-[1.4rem]"/>)}
                 </div>
               ) : wished.length === 0 ? (
                 <Card><Empty msg={t("acc.wishEmpty")} cta/></Card>

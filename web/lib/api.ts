@@ -1,4 +1,4 @@
-import type { Product, Order, User } from "./types";
+import type { Product, Order, Review, ReviewSummary, User } from "./types";
 import { medusa } from "./medusa";
 
 const BASE = typeof window === "undefined"
@@ -37,6 +37,18 @@ export const api = {
       return json<{ data: Product; related: Product[] }>(r);
     },
   },
+  // Reviews are Medusa-only: the legacy Express API never had them.
+  reviews: {
+    forProduct: (productId: string): Promise<ReviewSummary> =>
+      USE_MEDUSA ? medusa.reviews.forProduct(productId) : Promise.resolve({ rating: null, count: 0, reviews: [] }),
+    latest: (limit?: number): Promise<Review[]> =>
+      USE_MEDUSA ? medusa.reviews.latest(limit) : Promise.resolve([]),
+    create: (input: { product_id: string; rating: number; body: string; title?: string; name?: string }, token: string) => {
+      if (!USE_MEDUSA) throw new Error("Reviews require the Medusa backend");
+      return medusa.reviews.create(input, token);
+    },
+  },
+
   auth: {
     login: async (email: string, password: string) => {
       if (USE_MEDUSA) return medusa.auth.login(email, password);

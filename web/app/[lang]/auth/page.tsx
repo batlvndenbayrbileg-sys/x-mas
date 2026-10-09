@@ -6,6 +6,7 @@ import { useAuth, useToast } from "@/lib/store";
 import { useT, useLang } from "@/components/LangProvider";
 import { api } from "@/lib/api";
 import { EyeIcon, EyeOffIcon, ChevronLeft } from "@/components/Icons";
+import { Photo } from "@/components/Photo";
 
 function pwScore(pw: string): 0 | 1 | 2 | 3 {
   if (!pw) return 0;
@@ -23,6 +24,16 @@ const MailCheckIcon = ({ width = 24, height = 24 }: { width?: number; height?: n
     <path d="m16 17 2 2 4-4" />
   </svg>
 );
+
+const TickIcon = ({ width = 16, height = 16 }: { width?: number; height?: number }) => (
+  <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="m4 12.5 5.2 5.2L20 7" />
+  </svg>
+);
+
+// The shot that carries the panel — a cutout, so it sits on the ink field with
+// no box around it.
+const PANEL_SHOE = "/products/converse-chuck70-hi-black.png";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -97,44 +108,69 @@ export default function AuthPage() {
   const toggle = () => { setMode(isReg ? "login" : "register"); setErrors({}); setFormError(""); };
 
   return (
-    <div className="min-h-screen grid place-items-center px-4 py-8 sm:py-12" style={{ background: "linear-gradient(160deg, #FFFFFF 0%, #FDF3EC 100%)" }}>
-      <div className="relative w-full max-w-[960px] overflow-hidden rounded-[1.75rem] sm:rounded-[2.25rem] bg-white shadow-[0_40px_90px_-30px_rgba(232,85,10,.30)] ring-1 ring-black/5 lg:grid lg:grid-cols-2 lg:min-h-[580px]">
+    <div className="grid min-h-screen place-items-center bg-white px-4 py-8 sm:py-12">
+      <div className="relative w-full max-w-[1020px] overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-[0_40px_90px_-34px_rgba(22,21,21,.38)] sm:rounded-[2.25rem] lg:grid lg:min-h-[620px] lg:grid-cols-[1.05fr_1fr]">
 
-        {/* ============ PROMO (desktop) ============ */}
-        <div className="relative hidden lg:flex flex-col items-center justify-center px-12 py-14 text-center text-white"
-          style={{ background: "linear-gradient(150deg, #FF7A2E 0%, #E8550A 100%)" }}>
-          <div className="relative z-10 max-w-[300px]">
-            <h2 className="font-display text-[32px] leading-tight">{isReg ? t("auth.backPromo") : t("auth.newHere")}</h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-white/80">{isReg ? t("auth.backPromoDesc") : t("auth.newHereDesc")}</p>
+        {/* ============ PANEL (desktop) ============ */}
+        <div className="relative hidden flex-col justify-between overflow-hidden bg-ink px-12 py-12 text-white lg:flex">
+          {/* accent bloom + oversized wordmark, as on the dark homepage band */}
+          <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[380px] w-[380px] rounded-full bg-accent/25 blur-[90px]" />
+          <span aria-hidden className="pointer-events-none absolute -bottom-6 -left-4 select-none font-display text-[150px] uppercase leading-none tracking-[.02em] text-white/[.045]">X-MAS</span>
+
+          <div className="relative z-10">
+            <Link href="/" aria-label="X-MAS" className="inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="X-MAS" className="h-14 w-auto object-contain brightness-0 invert transition-opacity hover:opacity-80" />
+            </Link>
+            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[.2em] text-white/45">{t("auth.brandTag")}</p>
+            <h2 className="h-strike-2 mt-3 max-w-[9ch] text-white">{isReg ? t("auth.backPromo") : t("auth.newHere")}</h2>
+            <p className="mt-4 max-w-[330px] text-[14px] leading-relaxed text-white/60">{isReg ? t("auth.backPromoDesc") : t("auth.newHereDesc")}</p>
+
+            <ul className="mt-7 space-y-3">
+              {[t("auth.perk1"), t("auth.perk2"), t("auth.perk3")].map(perk => (
+                <li key={perk} className="flex items-center gap-3 text-[13.5px] text-white/85">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-white">
+                    <TickIcon width={13} height={13} />
+                  </span>
+                  {perk}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="relative z-10 flex items-end justify-between gap-4">
             <button type="button" onClick={toggle}
-              className="mt-9 h-11 rounded-full border-2 border-white/80 px-10 text-[13px] font-semibold uppercase tracking-[.12em] transition hover:bg-white hover:text-[#E8550A]">
+              className="h-12 shrink-0 rounded-pill border-2 border-white/70 px-8 text-[13px] font-semibold uppercase tracking-[.12em] transition-all duration-300 ease-spring hover:-translate-y-0.5 hover:bg-white hover:text-ink">
               {isReg ? t("auth.signIn") : t("auth.signUp")}
             </button>
+            <div aria-hidden className="relative -mb-6 -mr-6 h-[150px] w-[230px] shrink-0">
+              <Photo src={PANEL_SHOE} alt="" sizes="230px"
+                imgClassName="object-contain drop-shadow-[0_26px_30px_rgba(0,0,0,.5)]" />
+            </div>
           </div>
-          {/* curved divider bulging into the form panel */}
-          <svg className="absolute top-0 right-0 h-full w-[70px] translate-x-[99%]" viewBox="0 0 70 100" preserveAspectRatio="none" aria-hidden style={{ fill: "#E8550A" }}>
-            <path d="M0 0 C 48 20, 48 80, 0 100 Z" />
-          </svg>
         </div>
 
         {/* ============ FORM ============ */}
-        <div className="relative flex flex-col justify-center px-7 sm:px-10 lg:px-14 py-10 lg:py-12">
-          {/* Mobile top: back + brand + switch */}
-          <div className="lg:hidden mb-7 flex items-center justify-between">
-            <Link href="/" aria-label={t("bc.home")} className="grid h-9 w-9 -ml-1 place-items-center rounded-full text-ink/70 hover:bg-surface-2 transition">
+        <div className="relative flex flex-col justify-center px-6 py-9 sm:px-10 lg:px-12 lg:py-12">
+          {/* Mobile top: back · mark · switch */}
+          <div className="mb-7 flex items-center justify-between lg:hidden">
+            <Link href="/" aria-label={t("bc.home")} className="-ml-1 grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-surface-2">
               <ChevronLeft width={20} height={20} />
             </Link>
-            <span className="font-display text-[22px] tracking-[.04em]">X-MAS</span>
-            <button type="button" onClick={toggle} className="text-[13px] font-medium text-accent hover:underline">
+            <Link href="/" aria-label="X-MAS">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="X-MAS" className="h-10 w-auto object-contain" />
+            </Link>
+            <button type="button" onClick={toggle} className="-mr-2 px-2 py-2.5 text-[13px] font-semibold text-accent transition-colors hover:text-accent-deep">
               {isReg ? t("auth.signIn") : t("auth.signUp")}
             </button>
           </div>
 
-          <h1 className="font-display text-[28px] tracking-tight text-center lg:text-left">{isForgot ? t("auth.forgotTitle") : isReg ? t("auth.signUp") : t("auth.signIn")}</h1>
-          <p className="mt-1.5 text-[14px] text-muted text-center lg:text-left">{isForgot ? t("auth.forgotDesc") : isReg ? t("auth.freeForever") : t("auth.enterDetails")}</p>
+          <h1 className="h-strike-3 text-ink">{isForgot ? t("auth.forgotTitle") : isReg ? t("auth.signUp") : t("auth.signIn")}</h1>
+          <p className="mt-2 text-[14px] text-muted">{isForgot ? t("auth.forgotDesc") : isReg ? t("auth.freeForever") : t("auth.enterDetails")}</p>
 
           {isForgot && sent ? (
-            <div className="mt-8 flex flex-col items-center text-center lg:items-start lg:text-left">
+            <div className="mt-8 flex flex-col items-start text-left">
               <span className="grid h-12 w-12 place-items-center rounded-full bg-accent-soft text-accent">
                 <MailCheckIcon width={24} height={24} />
               </span>
@@ -181,7 +217,7 @@ export default function AuthPage() {
             {!isReg && !isForgot && (
               <div className="text-right -mt-1">
                 <button type="button" onClick={goForgot}
-                  className="text-[12px] text-muted hover:text-accent transition-colors">{t("auth.forgot")}</button>
+                  className="-mr-1 px-1 py-2 text-[12.5px] text-muted transition-colors hover:text-accent">{t("auth.forgot")}</button>
               </div>
             )}
 
@@ -192,8 +228,7 @@ export default function AuthPage() {
               </div>
             )}
             <button disabled={busy} type="submit"
-              className="w-full h-[52px] rounded-full text-white font-semibold uppercase tracking-[.12em] text-[13px] grid place-items-center disabled:opacity-60 transition active:scale-[.99] shadow-[0_12px_28px_-8px_rgba(110,84,236,.6)]"
-              style={{ background: "linear-gradient(95deg, #FF7A2E 0%, #E8550A 100%)" }}>
+              className="grid h-[52px] w-full place-items-center rounded-pill bg-accent text-[13px] font-semibold uppercase tracking-[.12em] text-white shadow-[0_14px_32px_-12px_rgba(241,89,43,.7)] transition-all duration-300 ease-spring hover:bg-accent-deep hover:-translate-y-0.5 active:scale-[.99] disabled:translate-y-0 disabled:opacity-60">
               {busy ? t("common.pleaseWait") : isForgot ? t("auth.sendResetLink") : isReg ? t("auth.signUp") : t("auth.signIn")}
             </button>
 
@@ -218,7 +253,7 @@ function FloatingField({ label, error, right, labelRight, name, ...props }: {
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
-      <div className={`rounded-2xl border px-4 py-2 bg-white transition focus-within:border-[#FF6A1A] focus-within:ring-4 focus-within:ring-[#FF6A1A]/10 ${error ? "border-red-400" : "border-line"}`}>
+      <div className={`rounded-2xl border bg-surface-2 px-4 py-2 transition focus-within:border-accent focus-within:bg-white focus-within:ring-4 focus-within:ring-accent/10 ${error ? "border-red-400" : "border-line"}`}>
         <div className="flex items-center justify-between">
           <label htmlFor={name} className="block text-[11px] font-medium text-subtle">{label}</label>
           {labelRight}

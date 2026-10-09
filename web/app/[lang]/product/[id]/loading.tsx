@@ -17,7 +17,7 @@ export default function ProductLoading() {
             <div className="flex lg:flex-col gap-2.5">
               {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="w-16 h-16 lg:w-20 lg:h-20 shrink-0 rounded-xl" />)}
             </div>
-            <Skeleton className="flex-1 rounded-[1.5rem] aspect-[4/5] sm:aspect-square" />
+            <Skeleton className="flex-1 rounded-[1.5rem] aspect-[6/5] sm:aspect-square" />
           </div>
 
           {/* info */}

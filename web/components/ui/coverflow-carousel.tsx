@@ -14,6 +14,8 @@ export interface CoverflowSlide {
   title?: string;
   subtitle?: string;
   meta?: { label: string; value: string }[];
+  /** Rich card body. When present it replaces the plain <img>. */
+  content?: React.ReactNode;
 }
 
 export interface CoverflowCarouselProps {
@@ -24,6 +26,8 @@ export interface CoverflowCarouselProps {
   falloff?: number;
   fade?: number;
   cardWidth?: string;
+  /** CSS aspect-ratio for each card; rich cards usually want a portrait box. */
+  cardAspect?: string;
   gap?: number;
   loop?: boolean;
   showCaption?: boolean;
@@ -42,6 +46,7 @@ export function CoverflowCarousel({
   falloff = 0.56,
   fade = 0.1,
   cardWidth = "clamp(148px, 22vw, 260px)",
+  cardAspect = "1 / 1",
   gap = 0.05,
   loop = true,
   showCaption = false,
@@ -52,6 +57,15 @@ export function CoverflowCarousel({
   cardClassName,
 }: CoverflowCarouselProps) {
   const count = slides.length;
+
+  // "3 / 4" or "0.82" -> numeric width/height ratio, used to size the stage.
+  const aspect = React.useMemo(() => {
+    const raw = String(cardAspect).trim();
+    const value = raw.includes("/")
+      ? (() => { const [w, h] = raw.split("/").map(n => Number(n.trim())); return h ? w / h : NaN; })()
+      : Number(raw);
+    return Number.isFinite(value) && value > 0 ? value : 1;
+  }, [cardAspect]);
 
   const frameRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -248,7 +262,7 @@ export function CoverflowCarousel({
           <div
             className="relative select-none"
             style={{
-              height: "var(--cf-card)",
+              height: `calc(var(--cf-card) / ${aspect})`,
               transformStyle: "preserve-3d",
             }}
           >
@@ -262,18 +276,20 @@ export function CoverflowCarousel({
                 aria-roledescription="slide"
                 aria-label={`${index + 1} of ${count}`}
                 className={cn(
-                  "absolute left-1/2 top-0 aspect-square overflow-hidden rounded-2xl bg-white border border-line shadow-xl will-change-transform",
+                  "absolute left-1/2 top-0 overflow-hidden rounded-2xl bg-white border border-line shadow-xl will-change-transform",
                   cardClassName,
                 )}
-                style={{ width: "var(--cf-card)" }}
+                style={{ width: "var(--cf-card)", aspectRatio: cardAspect }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={slide.src}
-                  alt={slide.alt}
-                  draggable={false}
-                  className="h-full w-full select-none object-cover"
-                />
+                {slide.content ?? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                    draggable={false}
+                    className="h-full w-full select-none object-cover"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -327,8 +343,8 @@ export function CoverflowCarousel({
               aria-current={index === selected}
               onClick={() => goTo(index)}
               className={cn(
-                "size-2 rounded-full bg-ink transition-opacity",
-                index === selected ? "opacity-100" : "opacity-30",
+                "h-2 rounded-full transition-all duration-300",
+                index === selected ? "w-7 bg-accent" : "w-2 bg-accent/25 hover:bg-accent/50",
               )}
             />
           ))}

@@ -42,14 +42,14 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     >
       <Link href={`/product/${product.slug}`} className="group block">
         {/* Image — kept clean; controls overlay, product info sits below */}
-        <div className="relative overflow-hidden rounded-[1.4rem] aspect-[4/5] bg-white border border-line transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep">
+        <div className="relative overflow-hidden rounded-[1.4rem] aspect-[6/5] bg-white border border-line transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep">
           <Photo
             src={product.image ?? productImg(product.id)}
             alt={product.name}
             fallback={fallback}
             sizes="(max-width: 768px) 50vw, 25vw"
             imgClassName={`transition-transform duration-700 ease-elegant group-hover:scale-[1.06] ${
-              isCutout ? "object-contain p-3" : "object-cover"
+              isCutout ? "object-contain p-1.5" : "object-cover"
             }`}
           />
           <div className={`absolute inset-0 pointer-events-none ${soldOut ? "backdrop-grayscale" : ""}`}/>

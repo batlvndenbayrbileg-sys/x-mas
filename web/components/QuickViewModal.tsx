@@ -94,7 +94,7 @@ export function QuickViewModal() {
               className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full grid place-items-center bg-white/85 backdrop-blur hover:bg-white shadow-soft text-xl leading-none">×</button>
 
             {/* Image */}
-            <div className="relative bg-white border-b sm:border-b-0 sm:border-r border-line aspect-[4/5] sm:aspect-auto sm:min-h-[420px]">
+            <div className="relative bg-white border-b sm:border-b-0 sm:border-r border-line aspect-[6/5] sm:aspect-auto sm:min-h-[420px]">
               <Photo src={img} alt={product.name}
                 fallback={<div className="absolute inset-0 grid place-items-center card-dark"><ProductVisual product={product} size="lg"/></div>}
                 imgClassName="absolute inset-0 w-full h-full object-cover"/>
@@ -109,11 +109,6 @@ export function QuickViewModal() {
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: product.accent }}/> {product.category}
               </span>
               <h2 className="font-display text-[26px] sm:text-[30px] uppercase tracking-[-.02em] leading-[.98] mt-3">{product.name}</h2>
-
-              <div className="flex items-center gap-2 text-[13px] text-muted mt-2" role="img" aria-label={`${t("common.rating")}: ${product.rating} / 5`}>
-                <span className="text-[#F4B400]" aria-hidden>★★★★★</span>
-                <span className="num-tabular">{product.rating}</span>
-              </div>
 
               <div className="flex items-baseline gap-3 mt-4">
                 <span className="font-display text-[26px] text-accent-deep">{money(product.price)}</span>

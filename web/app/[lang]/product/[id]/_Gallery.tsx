@@ -82,7 +82,7 @@ export function Gallery({ product, img }: { product: Product; img: string }) {
         onMouseMove={onMove}
         onClick={onClick}
         onKeyDown={onKeyDown}
-        className="group flex-1 rounded-[1.5rem] aspect-[4/5] sm:aspect-square overflow-hidden bg-white border border-line relative cursor-zoom-in outline-none"
+        className="group flex-1 rounded-[1.5rem] aspect-[6/5] sm:aspect-square overflow-hidden bg-white border border-line relative cursor-zoom-in outline-none"
       >
         <AnimatePresence initial={false} custom={dir}>
           <motion.div

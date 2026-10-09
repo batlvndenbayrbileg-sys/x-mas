@@ -94,13 +94,15 @@ function TrendCard({ product, featured }: { product: Product; featured?: boolean
       </div>
 
       {/* product shot */}
-      <div className={`relative w-full ${featured ? "flex-1 min-h-[180px] my-4" : "aspect-[5/4] my-2.5"}`}>
+      <div className={`relative w-full overflow-hidden ${featured ? "flex-1 min-h-[300px] sm:min-h-[380px] my-3" : "aspect-[3/2] my-2"}`}>
         <Photo
           src={product.image}
           alt={product.name}
           sizes={featured ? "(max-width:1024px) 90vw, 40vw" : "(max-width:1024px) 45vw, 20vw"}
-          imgClassName={`transition-transform duration-700 ease-elegant group-hover:scale-[1.07] ${
-            isCutout ? "object-contain" : "object-cover rounded-[1rem]"
+          imgClassName={`transition-transform duration-700 ease-elegant ${
+            isCutout
+              ? "object-contain group-hover:scale-[1.07]"
+              : "object-cover rounded-[1rem] group-hover:scale-[1.07]"
           }`}
         />
       </div>

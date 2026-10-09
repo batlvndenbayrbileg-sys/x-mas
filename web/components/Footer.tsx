@@ -60,10 +60,12 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 pt-16 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2.5">
-              <img src="/logo.jpg" alt="" aria-hidden className="h-8 w-auto rounded" />
-              <span className="font-display text-[26px] uppercase leading-none tracking-[.04em] text-accent">X-MAS</span>
-            </div>
+            {/* the mark already carries the wordmark, so it stands alone here;
+                it is pure black with alpha, so invert paints it white on the ink panel */}
+            <Link href="/" aria-label="X-MAS" className="inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="X-MAS" className="h-16 w-auto object-contain brightness-0 invert transition-opacity hover:opacity-80" />
+            </Link>
             <p className="mt-4 max-w-[280px] text-[13.5px] leading-relaxed text-white/55">{t("foot.tagline")}</p>
 
             <h5 className="mt-7 text-[13px] font-semibold text-white">{t("foot.social")}</h5>
@@ -88,7 +90,6 @@ export function Footer() {
           ]} />
           <FootCol title={t("foot.brand")} links={[
             ["/shop?category=Converse", t("cat.Converse")],
-            ["/shop?category=New%20Balance", t("cat.New Balance")],
             ["/shop?category=UGG", t("cat.UGG")],
             ["/shop?category=The%20North%20Face", t("cat.The North Face")],
           ]} />

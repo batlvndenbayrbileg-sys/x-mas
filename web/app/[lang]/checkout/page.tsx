@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Nav } from "@/components/Nav";
 import { CheckIcon, LockIcon } from "@/components/Icons";
+import { Photo } from "@/components/Photo";
 import { useCart, useToast, useAuth } from "@/lib/store";
 import { useT, useLang } from "@/components/LangProvider";
 import { money } from "@/lib/api";
@@ -159,11 +160,11 @@ export default function CheckoutPage() {
           <Link href="/cart" className="hover:text-ink uppercase">{t("bc.cart")}</Link><span className="opacity-40">/</span><span className="text-ink uppercase">{t("bc.checkout")}</span>
         </div>
 
-        <h1 className="font-display text-[30px] sm:text-[44px] uppercase tracking-tight leading-[.95] mt-3 mb-5">{t("co.titlePre")}<span className="text-accent">{t("co.titleAccent")}</span></h1>
+        <h1 className="h-strike-2 mt-3 mb-6 text-ink">{t("co.titlePre")}<span className="text-accent">{t("co.titleAccent")}</span></h1>
 
-        <div className="flex gap-1.5 sm:gap-2 mb-7 text-[12px] overflow-x-auto no-scrollbar">
+        <div className="no-scrollbar mb-8 flex items-center gap-2 overflow-x-auto rounded-2xl border border-line bg-white px-4 py-3 sm:gap-3 sm:px-6">
           <Step n={1} label={t("co.cart")} done/>
-          <Sep/>
+          <Sep done/>
           <Step n={2} label={t("co.information")} active/>
           <Sep/>
           <Step n={3} label={t("co.payment")}/>
@@ -254,10 +255,14 @@ export default function CheckoutPage() {
           <aside className="card p-7 h-fit lg:sticky lg:top-6">
             <h3 className="hd-3">{t("co.order")}</h3>
             <div className="my-3.5 py-3.5 border-t border-b border-border">
-              {mounted && items.map(i => (
-                <div key={i.id} className="flex justify-between py-2 text-muted">
-                  <span>{i.name} × {i.qty}</span>
-                  <span>{money(i.price * i.qty)}</span>
+              {mounted && items.map(it => (
+                <div key={it.id} className="flex items-center gap-3 py-2.5">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-line bg-white">
+                    <Photo src={it.image} alt="" sizes="64px" imgClassName="object-contain p-1.5" />
+                    <span className="absolute -right-1 -top-1 grid h-5 min-w-[20px] place-items-center rounded-full bg-ink px-1 text-[10px] font-bold text-white num-tabular">{it.qty}</span>
+                  </div>
+                  <span className="min-w-0 flex-1 text-[13px] leading-snug text-ink/80">{it.name}</span>
+                  <span className="shrink-0 text-[13px] font-semibold num-tabular">{money(it.price * it.qty)}</span>
                 </div>
               ))}
             </div>
@@ -305,9 +310,9 @@ export default function CheckoutPage() {
               </div>
             ))}
             <Row k={t("cart.tax")} v={money(tax)}/>
-            <div className="flex justify-between border-t border-border pt-4.5 mt-3 text-[18px] font-semibold">
+            <div className="mt-3 flex items-baseline justify-between border-t border-border pt-4 text-[17px] font-semibold">
               <span>{t("cart.total")}</span>
-              <span className="num-tabular overflow-hidden">
+              <span className="num-tabular overflow-hidden text-[22px] text-accent">
                 <motion.span key={total} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }} className="inline-block">
                   {money(total)}
                 </motion.span>
@@ -326,15 +331,17 @@ export default function CheckoutPage() {
 
 function Step({ n, label, active, done }: { n: number; label: string; active?: boolean; done?: boolean }) {
   return (
-    <div className={`flex items-center gap-2.5 font-medium ${active ? "text-ink" : done ? "text-ink" : "text-subtle"}`}>
-      <span className={`w-6.5 h-6.5 rounded-full grid place-items-center text-xs ${
-        done ? "bg-green-600 text-white" : active ? "bg-ink text-white" : "bg-surface-2"
-      }`} style={{ width: 26, height: 26 }}>{n}</span>
-      {label}
+    <div className={`flex shrink-0 items-center gap-2.5 ${active || done ? "text-ink" : "text-subtle"}`}>
+      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-bold transition-colors ${
+        done ? "bg-accent text-white" : active ? "bg-ink text-white ring-4 ring-ink/10" : "bg-surface-2 text-ink/40"
+      }`}>{done ? "✓" : n}</span>
+      <span className={`whitespace-nowrap text-[11.5px] uppercase tracking-[.1em] ${active ? "font-bold" : "font-medium"}`}>{label}</span>
     </div>
   );
 }
-function Sep() { return <span className="w-8 h-px bg-border self-center"/> }
+function Sep({ done }: { done?: boolean }) {
+  return <span className={`h-px w-5 shrink-0 self-center rounded-full sm:w-10 ${done ? "bg-accent" : "bg-border"}`}/>;
+}
 function Row({ k, v }: { k: string; v: string }) {
   return <div className="flex justify-between py-2 text-muted"><span>{k}</span><span>{v}</span></div>;
 }
@@ -344,9 +351,12 @@ function FormCard({ title, children, i = 0 }: { title: string; children: React.R
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: i * 0.07, ease: EASE }}
-      className="card p-7 mb-4"
+      className="card p-6 sm:p-7 mb-4"
     >
-      <h3 className="hd-3 mb-4">{title}</h3>
+      <div className="mb-5 flex items-center gap-3">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-[11px] font-bold text-white">{i + 1}</span>
+        <h3 className="hd-3">{title}</h3>
+      </div>
       {children}
     </motion.div>
   );

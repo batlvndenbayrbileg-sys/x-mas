@@ -6,6 +6,8 @@ import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { api, money } from "@/lib/api";
 import { productImg } from "@/lib/images";
+import { Stars } from "@/components/Stars";
+import { Reviews } from "./_Reviews";
 import { AddToCart } from "./_AddToCart";
 import { Tabs } from "./_Tabs";
 import { Gallery } from "./_Gallery";
@@ -66,6 +68,8 @@ export default async function ProductPage({ params }: { params: { lang: Lang; id
     notFound();
   }
   const img = product.image ?? productImg(product.id);
+  // Ratings shown on this page are computed from approved customer reviews only.
+  const summary = await api.reviews.forProduct(product.id);
 
   // schema.org Product/Offer structured data (rich results).
   const jsonLd = {
@@ -82,7 +86,9 @@ export default async function ProductPage({ params }: { params: { lang: Lang; id
       availability: (product.stock ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `${SITE_URL}/${params.lang}/product/${product.slug}`,
     },
-    ...(product.rating ? { aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviews || 1 } } : {}),
+    ...(summary.rating !== null && summary.count > 0
+      ? { aggregateRating: { "@type": "AggregateRating", ratingValue: summary.rating, reviewCount: summary.count } }
+      : {}),
   };
 
   // Breadcrumb trail for rich results (Нүүр › Дэлгүүр › Бараа).
@@ -119,11 +125,14 @@ export default async function ProductPage({ params }: { params: { lang: Lang; id
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: product.accent }}/> {product.category}
               </span>
               <h1 className="font-display text-[28px] sm:text-[40px] uppercase tracking-[-.02em] leading-[.95] mt-4">{product.name}</h1>
-              <div className="flex items-center gap-2 text-[13px] text-muted mt-3" role="img" aria-label={`${t("common.rating")}: ${product.rating} / 5`}>
-                <span className="text-[#F4B400]" aria-hidden>★★★★★</span>
-                <span className="num-tabular">{product.rating}</span><span className="opacity-40" aria-hidden>·</span>
-                <span className="num-tabular">{product.reviews.toLocaleString()} {t("common.reviews")}</span>
-              </div>
+              {summary.count > 0 && summary.rating !== null && (
+                <a href="#reviews" className="mt-3 inline-flex items-center gap-2 text-[13px] text-muted transition-colors hover:text-ink">
+                  <Stars rating={summary.rating} size={14} />
+                  <span className="num-tabular font-semibold text-ink">{summary.rating}</span>
+                  <span className="opacity-40" aria-hidden>·</span>
+                  <span className="num-tabular">{summary.count.toLocaleString()} {t("common.reviews")}</span>
+                </a>
+              )}
 
               <div className="flex items-baseline gap-3 mt-5">
                 <span className="font-display text-[30px] text-accent-deep">{money(product.price)}</span>
@@ -149,6 +158,10 @@ export default async function ProductPage({ params }: { params: { lang: Lang; id
           </section>
 
           <Tabs product={product}/>
+
+          <div id="reviews" className="scroll-mt-24">
+            <Reviews productId={product.id} summary={summary} lang={params.lang} />
+          </div>
 
           <section className="pt-8 pb-10">
             <Reveal>

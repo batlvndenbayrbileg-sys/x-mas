@@ -1,5 +1,21 @@
 // X-MAS — multi-brand sneaker + winter store. `Category` is the brand (taxonomy
 // lives in Medusa); `Shape` is the silhouette used by the fallback SVG visual.
+export type Review = {
+  id: string;
+  product_id: string;
+  name: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  verified: boolean;
+  created_at: string;
+  /** Present on the homepage feed, so a card can link to the product. */
+  product_handle?: string;
+};
+
+/** Mean rating and count over a product's approved reviews. */
+export type ReviewSummary = { rating: number | null; count: number; reviews: Review[] };
+
 export type Category = "Converse" | "New Balance" | "UGG" | "The North Face";
 export type Shape =
   // sneakers (Converse / New Balance)
@@ -19,8 +35,8 @@ export type Product = {
   season: "Winter" | "Summer" | "All-Season";
   price: number;
   was?: number;
-  rating: number;
-  reviews: number;
+  // Ratings are NOT part of the product record — they are derived from real
+  // customer reviews (see ReviewSummary), so nothing invented can be displayed.
   badge?: "Sale" | "New" | null;
   colors: string[];
   sizes: string[];

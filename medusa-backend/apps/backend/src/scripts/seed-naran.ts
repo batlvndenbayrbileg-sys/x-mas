@@ -26,42 +26,18 @@ const AP = ["XS", "S", "M", "L", "XL", "XXL"];
 // «X-MAS» — бодит каталог (Converse + New Balance). Үнэ шууд төгрөгөөр (mnt).
 const CATALOG: Seed[] = [
   // ── Converse — Chuck 70 / Chuck Taylor ──
-  { title: "Converse Chuck 70 Hi Navy", handle: "converse-chuck70-hi-navy", price: 349000, cat: "Converse", sizes: CV, desc: "Chuck 70 өндөр хийц, navy даавуун гадаргуу, vintage тал улавчтай." },
-  { title: "Converse Chuck 70 Hi Daisy Blue", handle: "converse-chuck70-hi-daisy-blue", price: 349000, cat: "Converse", sizes: CV, desc: "Цэнхэр даавуун Chuck 70, хатгамал цагаан цэцэгтэй өндөр хийц." },
-  { title: "Converse Chuck 70 Hi Natural", handle: "converse-chuck70-hi-natural", price: 349000, cat: "Converse", sizes: CV, desc: "Parchment/natural өнгийн сонгодог Chuck 70 өндөр хийц." },
-  { title: "Converse Chuck 70 Hi White Star", handle: "converse-chuck70-hi-white-star", price: 349000, cat: "Converse", sizes: CV, desc: "Цагаан даавуун Chuck 70, хажуугийн од хээтэй өндөр хийц." },
-  { title: "Converse Chuck 70 Hi Grey Denim", handle: "converse-chuck70-hi-grey-denim", price: 349000, cat: "Converse", sizes: CV, desc: "Саарал жинсэн Chuck 70, distressed фрэй хээтэй өндөр хийц." },
-  { title: "Converse Chuck 70 Hi Daisy White", handle: "converse-chuck70-hi-daisy-white", price: 349000, cat: "Converse", sizes: CV, desc: "Цагаан Chuck 70, хатгамал цэцэгтэй өндөр хийц." },
   { title: "Converse Chuck 70 Hi Black", handle: "converse-chuck70-hi-black", price: 349000, cat: "Converse", sizes: CV, desc: "Сонгодог хар Chuck 70, All Star patch-тай өндөр хийц." },
-  { title: "Converse Chuck 70 Hi Blue", handle: "converse-chuck70-hi-blue", price: 349000, cat: "Converse", sizes: CV, desc: "Navy blue сонгодог Chuck 70 өндөр хийц." },
-  { title: "Converse Chuck 70 Hi Black Star", handle: "converse-chuck70-hi-black-star", price: 349000, cat: "Converse", sizes: CV, desc: "Хар даавуун Chuck 70, хажуугийн цагаан од хээтэй." },
-  { title: "Converse Chuck Low Zip Cream", handle: "converse-chuck-low-zip-cream", price: 349000, cat: "Converse", sizes: CV, desc: "Cream өнгийн намхан Chuck, урд талын цахилгаантай." },
-  { title: "Converse Chuck Low Zip Black", handle: "converse-chuck-low-zip-black", price: 349000, cat: "Converse", sizes: CV, desc: "Хар намхан Chuck, урд талын цахилгаантай." },
   { title: "Converse Chuck Low Blue Check", handle: "converse-chuck-low-blue-check", price: 349000, cat: "Converse", sizes: CV, desc: "Цэнхэр намхан Chuck, шатрын хээтэй онцгой хувилбар." },
-  { title: "Converse Chuck Low Pink Stars", handle: "converse-chuck-low-pink-stars", price: 349000, cat: "Converse", sizes: CV, desc: "Ягаан намхан Chuck, цэнхэр од хээтэй." },
-  { title: "Converse Chuck Low Grey Stars", handle: "converse-chuck-low-grey-stars", price: 349000, cat: "Converse", sizes: CV, desc: "Саарал намхан Chuck, од хээтэй." },
-  { title: "Converse Chuck Low Cream Stars", handle: "converse-chuck-low-cream-stars", price: 349000, cat: "Converse", sizes: CV, desc: "Cream намхан Chuck, мөнгөлөг од хээтэй." },
-  { title: "Converse Chuck Platform Pink", handle: "converse-chuck-platform-pink", price: 349000, cat: "Converse", sizes: CV, desc: "Ягаан patent өндөр platform Chuck — өндөрсгөсөн тал улавчтай." },
   { title: "Converse Chuck Low Platform Black Stars", handle: "converse-chuck-low-black-stars", price: 349000, cat: "Converse", sizes: CV, desc: "Хар namhan platform Chuck, мөнгөлөг од хээтэй." },
 
   // ── Converse — One Star / Star Player ──
-  { title: "Converse One Star Mustard Suede", handle: "converse-one-star-mustard", price: 349000, cat: "Converse", sizes: CV, desc: "Гичийн шар suede One Star, IRAK Gore-Tex, хар тал улавчтай." },
-  { title: "Converse One Star Navy Suede", handle: "converse-one-star-navy", price: 349000, cat: "Converse", sizes: CV, desc: "Navy suede One Star, IRAK Gore-Tex, моно хар тал улавчтай." },
-  { title: "Converse One Star Black Suede", handle: "converse-one-star-black", price: 349000, cat: "Converse", sizes: CV, desc: "Моно хар suede One Star, цагаан одтой." },
   { title: "Converse Star Player 76 Burgundy", handle: "converse-star-player-burgundy", price: 299000, cat: "Converse", sizes: CV, desc: "Burgundy suede Star Player 76, cream тал улавч, chevron логотой." },
 
   // ── Converse — Suede low / retro trainer ──
-  { title: "Converse Suede Retro Pink", handle: "converse-suede-retro-pink", price: 349000, cat: "Converse", sizes: CV, desc: "Ягаан suede намхан retro, цэнхэр үдээстэй." },
-  { title: "Converse Suede Low Red", handle: "converse-suede-low-red", price: 349000, cat: "Converse", sizes: CV, desc: "Улаан suede намхан, ягаан үдээстэй, cream тал улавчтай." },
   { title: "Converse Suede Low Black", handle: "converse-suede-low-black", price: 349000, cat: "Converse", sizes: CV, desc: "Хар suede намхан, хос өнгийн үдээстэй, cream хамартай." },
-  { title: "Converse Futsal Black Gum", handle: "converse-futsal-black", price: 299000, cat: "Converse", sizes: CV, desc: "Хар futsal силуэт, gum тал улавч, chevron логотой." },
   { title: "Converse Retro Trainer Burgundy", handle: "converse-retro-trainer-burgundy", price: 299000, cat: "Converse", sizes: CV, desc: "Burgundy retro гүйлтийн силуэт, gum тал улавчтай." },
-  { title: "Converse Retro Trainer Green", handle: "converse-retro-trainer-green", price: 299000, cat: "Converse", sizes: CV, desc: "Ногоон retro гүйлтийн силуэт, gum тал улавчтай." },
 
   // ── New Balance 1906A (хямдралтай) ──
-  { title: "New Balance 1906A Silver", handle: "nb-1906a-silver", price: 250000, cat: "New Balance", sizes: NB, desc: "Мөнгөлөг/цагаан 1906A, N-ergy дэрлэгтэй Y2K силуэт. Хямдралтай." },
-  { title: "New Balance 1906A Black", handle: "nb-1906a-black", price: 250000, cat: "New Balance", sizes: NB, desc: "Моно хар 1906A, N-ergy дэрлэгтэй Y2K силуэт. Хямдралтай." },
-  { title: "New Balance 1906A Grey", handle: "nb-1906a-grey", price: 250000, cat: "New Balance", sizes: NB, desc: "Саарал 1906A, N-ergy дэрлэгтэй Y2K силуэт. Хямдралтай." },
 
   // ── UGG — өвлийн гутал, платформ, puffer, пүүз, шаахай ──
   { title: "UGG Classic Aztec Knit Boot", handle: "ugg-classic-knit-aztec", price: 540000, cat: "UGG", sizes: UG, desc: "Олон өнгийн ацтек нэхмэл eskimo гутал, хонины арьсан дулаалгатай." },
@@ -141,6 +117,17 @@ const OLD_HANDLES = [
   "windbreaker-jacket","lined-training-shorts","seamless-leggings","womens-cropped-tee",
   "tactical-sling-bag","performance-cap","thermal-hooded-base","cargo-tech-pants",
   "sweatshirt","sweatpants","shorts","t-shirt",
+  // Retired Oct 2026: promo-card JPGs carrying a grey studio backdrop, the
+  // CONVERSE/NEW BALANCE wordmark and a baked-in price. Replaced by the
+  // transparent cutouts, which is the whole catalogue now.
+  "converse-chuck-low-cream-stars","converse-chuck-low-grey-stars","converse-chuck-low-pink-stars",
+  "converse-chuck-low-zip-black","converse-chuck-low-zip-cream","converse-chuck-platform-pink",
+  "converse-chuck70-hi-black-star","converse-chuck70-hi-blue","converse-chuck70-hi-daisy-blue",
+  "converse-chuck70-hi-daisy-white","converse-chuck70-hi-grey-denim","converse-chuck70-hi-natural",
+  "converse-chuck70-hi-navy","converse-chuck70-hi-white-star","converse-futsal-black",
+  "converse-one-star-black","converse-one-star-mustard","converse-one-star-navy",
+  "converse-retro-trainer-green","converse-suede-low-red","converse-suede-retro-pink",
+  "nb-1906a-black","nb-1906a-grey","nb-1906a-silver",
 ];
 
 export default async function seedNaran({ container }: ExecArgs) {
@@ -216,5 +203,5 @@ export default async function seedNaran({ container }: ExecArgs) {
     } catch { /* already linked */ }
   }
   logger.info(`Sales-channel links: ${linked} created, ${all.length - linked} already present`);
-  logger.info(`X-MAS catalog ready — ${all.length} products (Converse + New Balance).`);
+  logger.info(`X-MAS catalog ready — ${all.length} products (Converse, UGG, The North Face).`);
 }
