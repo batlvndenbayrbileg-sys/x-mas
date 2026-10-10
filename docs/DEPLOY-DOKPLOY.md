@@ -32,7 +32,7 @@ Open `http://<vps-ip>:3000`, create the admin account.
 
 ## 3. Create a Compose project in Dokploy
 1. **Create Project → Compose**.
-2. **Provider: GitHub** → connect the account → repo `batlvndenbayrbileg-sys/xmas`, branch `main`.
+2. **Provider: GitHub** → connect the account → repo `batlvndenbayrbileg-sys/x-mas`, branch `main`.
 3. **Compose Path:** `infra/docker-compose.prod.yml`.
 
 ## 4. Environment
