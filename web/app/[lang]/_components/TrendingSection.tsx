@@ -70,7 +70,6 @@ function GoButton({ small }: { small?: boolean }) {
 }
 
 function TrendCard({ product, featured }: { product: Product; featured?: boolean }) {
-  const isCutout = (product.image ?? "").endsWith(".png");
   const small = !featured;
   return (
     <Link
@@ -99,11 +98,7 @@ function TrendCard({ product, featured }: { product: Product; featured?: boolean
           src={product.image}
           alt={product.name}
           sizes={featured ? "(max-width:1024px) 90vw, 40vw" : "(max-width:1024px) 45vw, 20vw"}
-          imgClassName={`transition-transform duration-700 ease-elegant ${
-            isCutout
-              ? "object-contain group-hover:scale-[1.07]"
-              : "object-cover rounded-[1rem] group-hover:scale-[1.07]"
-          }`}
+          imgClassName="object-contain transition-transform duration-700 ease-elegant group-hover:scale-[1.07]"
         />
       </div>
 

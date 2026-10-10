@@ -24,7 +24,6 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
   const t = useT();
   // Every product sits on a white tile: transparent PNG cutouts are letterboxed
   // with object-contain, promo-card JPGs fill it with object-cover.
-  const isCutout = (product.image ?? "").endsWith(".png");
 
   const fallback = (
     <div className="absolute inset-0 grid place-items-center bg-white">
@@ -48,9 +47,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             alt={product.name}
             fallback={fallback}
             sizes="(max-width: 768px) 50vw, 25vw"
-            imgClassName={`transition-transform duration-700 ease-elegant group-hover:scale-[1.06] ${
-              isCutout ? "object-contain p-1.5" : "object-cover"
-            }`}
+            imgClassName="object-contain p-1.5 transition-transform duration-700 ease-elegant group-hover:scale-[1.06]"
           />
           <div className={`absolute inset-0 pointer-events-none ${soldOut ? "backdrop-grayscale" : ""}`}/>
 

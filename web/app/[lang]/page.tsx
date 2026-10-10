@@ -31,9 +31,9 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
   ]);
   const all = res.data;
 
-  // The landing page is sneaker-led, and only transparent cutouts read cleanly
-  // on a white canvas (the legacy promo-card JPGs carry their own grey artwork).
-  const cutouts = all.filter(p => (p.image ?? "").endsWith(".png"));
+  // Every product is a transparent cutout, so the whole catalogue reads
+  // cleanly on the white canvas; the landing page is still sneaker-led.
+  const cutouts = all;
   const sneakers = cutouts.filter(p =>
     p.category === "Converse" || p.category === "New Balance" || p.shape === "sneaker");
   const pool = sneakers.length >= 4 ? sneakers : cutouts;
