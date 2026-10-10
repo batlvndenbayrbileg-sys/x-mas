@@ -3,9 +3,10 @@ import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { createProductsWorkflow } from "@medusajs/medusa/core-flows";
 import { MN_TO_HANDLE } from "./seed-categories";
 
-// Product photos live in web/public/products/<handle>.png — every product is a
-// transparent cutout, so the storefront reads as one set on its white canvas.
-const IMG = (handle: string) => `/products/${handle}.png`;
+// Product photos live in web/public/products/<handle>.webp — transparent
+// cutouts, so the storefront reads as one set on its white canvas, and WebP so
+// 166 of them do not cost 78MB.
+const IMG = (handle: string) => `/products/${handle}.webp`;
 
 type Seed = {
   title: string; handle: string; price: number; cat: string;

@@ -27,9 +27,9 @@ const YtIcon = (p: any) => (
 // Photo backdrop for the newsletter card — a row of product shots, kept bright
 // enough to read as photography with only a light scrim over it.
 const SHOTS = [
-  "/products/converse-chuck70-hi-black.png",
+  "/products/converse-chuck70-hi-black.webp",
   "/hero.png",
-  "/products/converse-retro-trainer-burgundy.png",
+  "/products/converse-retro-trainer-burgundy.webp",
 ];
 
 export function Footer() {

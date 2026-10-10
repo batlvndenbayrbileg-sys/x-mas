@@ -33,7 +33,7 @@ const TickIcon = ({ width = 16, height = 16 }: { width?: number; height?: number
 
 // The shot that carries the panel — a cutout, so it sits on the ink field with
 // no box around it.
-const PANEL_SHOE = "/products/converse-chuck70-hi-black.png";
+const PANEL_SHOE = "/products/converse-chuck70-hi-black.webp";
 
 export default function AuthPage() {
   const router = useRouter();
