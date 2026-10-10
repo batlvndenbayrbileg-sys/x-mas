@@ -4,11 +4,19 @@ Dokploy runs the **whole X-MAS stack from one Docker Compose file** on your own
 VPS — Postgres, Redis, MeiliSearch, Medusa (server + worker), the Express API and
 the Next.js storefront, with Traefik TLS/routing built in.
 
-- **Repo:** `github.com/batlvndenbayrbileg-sys/xmas` (branch `main`)
+- **Repo:** `github.com/batlvndenbayrbileg-sys/x-mas` (branch `main`)
 - **Compose file:** `infra/docker-compose.prod.yml` (validated ✓, env-driven)
 - **Env template:** `infra/.env.prod.example`
-- VPS sizing: ~**4 GB RAM** min (Postgres 768m + Medusa 1G + worker 640m + web
-  512m + api + redis + meili). 6–8 GB comfortable.
+- **VPS sizing — get 8 GB.** The service `mem_limit`s in the compose file add up
+  to **3.9 GB** at steady state (Postgres 768m + Medusa 1024m + worker 640m + web
+  512m + meili 512m + redis 256m + api 256m). A 4 GB box has nothing left for the
+  kernel, Docker, Dokploy and Traefik, and the build itself peaks higher — it will
+  OOM. 8 GB (e.g. Hetzner CX32) leaves comfortable headroom.
+- **Running on 4 GB anyway?** Drop the two optional services and the stack fits in
+  ~2.8 GB: comment out `meilisearch` and `medusa-worker` in
+  `infra/docker-compose.prod.yml`, and set `NEXT_PUBLIC_MEILISEARCH=0` in the env.
+  Medusa then runs in shared mode (it processes its own jobs) and storefront
+  search falls back to Medusa's built-in query. Both can be added back later.
 
 ---
 
@@ -43,8 +51,17 @@ tab and fill the blanks:
 - `api` stays internal (no domain — `web` reaches it at `http://api:4000`)
 
 ## 6. Deploy
-Hit **Deploy**. Order is automatic: `postgres`/`redis`/`meilisearch` → `medusa-migrate`
+Hit **Deploy**. The images are built **on the VPS** — the Next.js build is the
+memory-hungry step (it peaks well above the 512m the running container is capped
+at), which is the other reason a 4 GB box struggles. If a build is OOM-killed,
+add swap (`fallocate -l 4G /swapfile && mkswap /swapfile && swapon /swapfile`)
+or build elsewhere and push images to a registry.
+
+ Order is automatic: `postgres`/`redis`/`meilisearch` → `medusa-migrate`
 (runs `db:migrate` once) → `medusa` + `medusa-worker` → `api` → `web`.
+
+`medusa-migrate` applies every module migration, so schema added since the last
+deploy — the customer `review` table, for one — is created without a manual step.
 
 ## 7. Seed the catalog + admin (once)
 Dokploy → `medusa` service → **Terminal**:
@@ -53,8 +70,9 @@ cd .medusa/server
 npx medusa exec ./src/scripts/seed-region.ts
 npx medusa exec ./src/scripts/seed-shipping.ts
 npx medusa exec ./src/scripts/seed-mnt.ts
-npx medusa exec ./src/scripts/seed-categories.ts   # Converse + New Balance
-npx medusa exec ./src/scripts/seed-naran.ts        # 30 X-MAS products
+npx medusa exec ./src/scripts/seed-return-shipping.ts
+npx medusa exec ./src/scripts/seed-categories.ts   # Converse, UGG, The North Face
+npx medusa exec ./src/scripts/seed-naran.ts        # the 64-product X-MAS catalogue
 npx medusa exec ./src/scripts/seed-inventory.ts
 npx medusa user -e admin@xmas.mn -p '<STRONG_PASSWORD>'
 ```
