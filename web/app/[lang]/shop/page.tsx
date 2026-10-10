@@ -34,7 +34,7 @@ export function generateMetadata(
   };
 }
 
-const cats = ["all", "Converse", "UGG", "The North Face"];
+const cats = ["all", "Converse", "Nike", "New Balance", "UGG", "The North Face", "ASICS", "Salomon", "Christian Dior"];
 
 export default async function ShopPage({
   params,

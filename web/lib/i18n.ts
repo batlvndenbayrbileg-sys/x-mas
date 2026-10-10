@@ -24,6 +24,7 @@ const en: Dict = {
   // categories (brands)
   "cat.all": "All", "cat.Nike": "Nike", "cat.Adidas": "Adidas", "cat.New Balance": "New Balance",
   "cat.Puma": "Puma", "cat.Converse": "Converse", "cat.UGG": "UGG", "cat.The North Face": "The North Face",
+  "cat.ASICS": "ASICS", "cat.Salomon": "Salomon", "cat.Christian Dior": "Dior",
   // home
   "home.newSeason": "New drops", "home.category": "Shop by brand", "home.recommended": "Recommended",
   "home.freshFits": "Level up your rotation!", "home.newArrival": "New arrival",
@@ -202,7 +203,7 @@ const en: Dict = {
   "cart.titlePre": "Your", "cart.titleAccent": "bag",
   "co.titlePre": "Check", "co.titleAccent": "out", "co.mongolia": "Mongolia",
   "shop.titlePre": "All", "shop.titleAccent": "Sneakers",
-  "type.sneakers": "Sneakers", "type.boots": "Boots", "type.jackets": "Down jackets",
+  "type.sneakers": "Sneakers", "type.boots": "Boots", "type.jackets": "Down jackets", "type.bags": "Bags",
   "shop.allTypes": "All types", "shop.titleAll": "Products",
   // processing
   "proc.missingRef": "Missing payment reference", "proc.verifyFailed": "Payment verification failed",
@@ -247,7 +248,7 @@ const en: Dict = {
   "acc.requestReturn": "Request return", "acc.returnPick": "Choose items to return", "acc.returnNote": "Reason (optional)",
   "acc.returnSubmit": "Submit request", "acc.returnSent": "Return request submitted", "acc.returnFailed": "Return could not be requested", "acc.returnRequested": "Return requested",
   // shop
-  "shop.items": "pairs", "shop.sort": "Sort", "shop.sortNew": "Newest", "shop.sortPriceAsc": "Price ↑",
+  "shop.items": "items", "shop.sort": "Sort", "shop.sortNew": "Newest", "shop.sortPriceAsc": "Price ↑",
   "shop.sortPriceDesc": "Price ↓", "shop.sortRating": "Top rated",
   "shop.filters": "Filters", "shop.fPrice": "Price", "shop.fTech": "Type", "shop.min": "Min", "shop.max": "Max",
   "shop.tLifestyle": "Lifestyle", "shop.tRunning": "Running", "shop.tSkate": "Skate", "shop.tCanvas": "Canvas",
@@ -271,6 +272,7 @@ const mn: Dict = {
   "common.exploreAll": "Бүгдийг үзэх", "common.browseShop": "Дэлгүүр үзэх",
   "cat.all": "Бүгд", "cat.Nike": "Nike", "cat.Adidas": "Adidas", "cat.New Balance": "New Balance",
   "cat.Puma": "Puma", "cat.Converse": "Converse", "cat.UGG": "UGG", "cat.The North Face": "The North Face",
+  "cat.ASICS": "ASICS", "cat.Salomon": "Salomon", "cat.Christian Dior": "Dior",
   "home.newSeason": "Шинэ бараа", "home.category": "Брэндээр сонгох", "home.recommended": "Санал болгох",
   "home.freshFits": "Пүүзний цуглуулгаа дээшлүүл!", "home.newArrival": "Шинэ ирэлт",
   "home.allBrands": "Бүх брэнд", "home.seeAllBrands": "Бүгдийг үзэх",
@@ -442,7 +444,7 @@ const mn: Dict = {
   "cart.titlePre": "Таны", "cart.titleAccent": "сагс",
   "co.titlePre": "", "co.titleAccent": "Төлбөр", "co.mongolia": "Монгол",
   "shop.titlePre": "Бүх", "shop.titleAccent": "Пүүз",
-  "type.sneakers": "Пүүз", "type.boots": "Гутал", "type.jackets": "Куртик",
+  "type.sneakers": "Пүүз", "type.boots": "Гутал", "type.jackets": "Куртик", "type.bags": "Цүнх",
   "shop.allTypes": "Бүх төрөл", "shop.titleAll": "Бараа",
   // processing
   "proc.missingRef": "Төлбөрийн лавлагаа алга", "proc.verifyFailed": "Төлбөр баталгаажуулж чадсангүй",
@@ -487,7 +489,7 @@ const mn: Dict = {
   "acc.requestReturn": "Буцаах хүсэлт", "acc.returnPick": "Буцаах бараагаа сонго", "acc.returnNote": "Шалтгаан (заавал биш)",
   "acc.returnSubmit": "Хүсэлт илгээх", "acc.returnSent": "Буцаалтын хүсэлт илгээгдлээ", "acc.returnFailed": "Буцаалт илгээж чадсангүй", "acc.returnRequested": "Буцаалт хүссэн",
   // shop
-  "shop.items": "пар", "shop.sort": "Эрэмбэлэх", "shop.sortNew": "Шинэ", "shop.sortPriceAsc": "Үнэ ↑",
+  "shop.items": "бараа", "shop.sort": "Эрэмбэлэх", "shop.sortNew": "Шинэ", "shop.sortPriceAsc": "Үнэ ↑",
   "shop.sortPriceDesc": "Үнэ ↓", "shop.sortRating": "Үнэлгээгээр",
   "shop.filters": "Шүүлтүүр", "shop.fPrice": "Үнэ", "shop.fTech": "Төрөл", "shop.min": "Доод", "shop.max": "Дээд",
   "shop.tLifestyle": "Lifestyle", "shop.tRunning": "Гүйлт", "shop.tSkate": "Скейт", "shop.tCanvas": "Даавуу",

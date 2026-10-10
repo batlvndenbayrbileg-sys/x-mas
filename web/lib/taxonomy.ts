@@ -5,14 +5,15 @@ import type { Product, Shape } from "./types";
  * sit in different rows even though both are footwear. Brand stays its own
  * filter (`?category=`), so the two narrow independently.
  */
-export type ProductType = "sneakers" | "boots" | "jackets";
+export type ProductType = "sneakers" | "boots" | "jackets" | "bags";
 
 export const TYPES: { key: ProductType; shapes: Shape[] }[] = [
-  { key: "sneakers", shapes: ["sneaker", "lowtop", "hightop", "runner", "chunky", "skate"] },
+  { key: "sneakers", shapes: ["sneaker", "lowtop", "hightop", "runner", "chunky", "skate", "trail"] },
   // Slippers and clogs are bought from the same shelf as boots, and there are
   // too few of them to carry a row of their own.
   { key: "boots", shapes: ["boot", "clog", "slipper", "slide"] },
   { key: "jackets", shapes: ["jacket", "parka"] },
+  { key: "bags", shapes: ["bag"] },
 ];
 
 const OF_SHAPE = new Map<Shape, ProductType>(

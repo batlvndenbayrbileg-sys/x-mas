@@ -4,8 +4,9 @@ import { ENRICH, DEFAULT_ENRICH } from "./enrich";
 // Medusa category handle → storefront Category key. Taxonomy lives in Medusa
 // (product categories), so this scales to a 10k+ catalog with no per-product map.
 const HANDLE_TO_CATEGORY: Record<string, Category> = {
-  converse: "Converse", "new-balance": "New Balance",
-  ugg: "UGG", "the-north-face": "The North Face",
+  converse: "Converse", nike: "Nike", "new-balance": "New Balance",
+  asics: "ASICS", salomon: "Salomon",
+  ugg: "UGG", "the-north-face": "The North Face", "christian-dior": "Christian Dior",
 };
 
 const URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -167,12 +168,33 @@ function map(m: any): Product {
 
 // Server-side product fetch. Passing `q` runs Medusa's full-text search, which
 // scales to large catalogs (10,000+) — the storefront never loads everything.
-async function fetchProducts(opts: { q?: string; limit?: number; offset?: number; categoryId?: string; revalidate?: number } = {}): Promise<{ products: Product[]; total: number }> {
-  const p = new URLSearchParams({ limit: String(opts.limit ?? 100), offset: String(opts.offset ?? 0), region_id: REGION, fields: FIELDS });
+// Medusa caps a single page, so a caller that wants the whole list (no explicit
+// limit — the browse and homepage reads) walks the pages until it has them all.
+// Without this the storefront silently truncated once the catalogue passed 100.
+const PRODUCT_PAGE = 100;
+
+async function fetchProductPage(opts: { q?: string; limit: number; offset: number; categoryId?: string; revalidate?: number }) {
+  const p = new URLSearchParams({ limit: String(opts.limit), offset: String(opts.offset), region_id: REGION, fields: FIELDS });
   if (opts.q) p.set("q", opts.q);
   if (opts.categoryId) p.append("category_id[]", opts.categoryId);
   const res = await mfetch(`products?${p.toString()}`, 1, opts.revalidate);
   return { products: (res.products || []).map(map), total: res.count ?? (res.products?.length ?? 0) };
+}
+
+async function fetchProducts(opts: { q?: string; limit?: number; offset?: number; categoryId?: string; revalidate?: number } = {}): Promise<{ products: Product[]; total: number }> {
+  const offset = opts.offset ?? 0;
+  const first = await fetchProductPage({ ...opts, limit: opts.limit ?? PRODUCT_PAGE, offset });
+  // An explicit limit means the caller asked for exactly that many.
+  if (typeof opts.limit === "number") return first;
+
+  const products = first.products;
+  for (let next = offset + products.length; next < first.total; ) {
+    const page = await fetchProductPage({ ...opts, limit: PRODUCT_PAGE, offset: next });
+    if (!page.products.length) break;
+    products.push(...page.products);
+    next += page.products.length;
+  }
+  return { products, total: first.total };
 }
 const fetchAll = async (): Promise<Product[]> => (await fetchProducts()).products;
 

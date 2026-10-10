@@ -90,6 +90,8 @@ export function Footer() {
           ]} />
           <FootCol title={t("foot.brand")} links={[
             ["/shop?category=Converse", t("cat.Converse")],
+            ["/shop?category=Nike", t("cat.Nike")],
+            ["/shop?category=New%20Balance", t("cat.New Balance")],
             ["/shop?category=UGG", t("cat.UGG")],
             ["/shop?category=The%20North%20Face", t("cat.The North Face")],
           ]} />

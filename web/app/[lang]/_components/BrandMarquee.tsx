@@ -8,6 +8,10 @@ import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 // loop always fills a wide row.
 const BRANDS = [
   { name: "Converse", href: "/shop?category=Converse", logo: "/brands/converse.svg" },
+  { name: "Nike", href: "/shop?category=Nike", logo: "/brands/nike.svg" },
+  { name: "New Balance", href: "/shop?category=New%20Balance", logo: "/brands/new-balance.svg" },
+  { name: "ASICS", href: "/shop?category=ASICS", logo: "/brands/asics.svg" },
+  { name: "Salomon", href: "/shop?category=Salomon", logo: "/brands/salomon.svg" },
   { name: "UGG", href: "/shop?category=UGG", logo: "/brands/ugg.svg" },
   { name: "The North Face", href: "/shop?category=The%20North%20Face", logo: "/brands/the-north-face.svg" },
 ];

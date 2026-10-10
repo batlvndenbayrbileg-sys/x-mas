@@ -114,7 +114,7 @@ export function Nav() {
         </Link>
 
         <div className="flex items-center gap-5 xl:gap-6 min-w-0">
-          {[["/shop","nav.shop","inline-flex"],["/shop?category=Converse","cat.Converse","hidden xl:inline-flex"],["/shop?category=UGG","cat.UGG","hidden xl:inline-flex"],["/shop?category=The%20North%20Face","cat.The North Face","hidden 2xl:inline-flex"],["/shop?filter=sale","nav.accessories","hidden xl:inline-flex"]].map(([h,k,vis]) => (
+          {[["/shop","nav.shop","inline-flex"],["/shop?category=Converse","cat.Converse","hidden xl:inline-flex"],["/shop?category=Nike","cat.Nike","hidden xl:inline-flex"],["/shop?category=UGG","cat.UGG","hidden xl:inline-flex"],["/shop?category=The%20North%20Face","cat.The North Face","hidden 2xl:inline-flex"],["/shop?filter=sale","nav.accessories","hidden xl:inline-flex"]].map(([h,k,vis]) => (
             <Link key={k as string} href={h as string}
               aria-current={pathname === h ? "page" : undefined}
               className={`relative whitespace-nowrap text-[12px] uppercase tracking-[.12em] font-medium transition-colors after:absolute after:left-0 after:-bottom-1.5 after:h-[1.5px] after:bg-accent after:transition-all after:duration-300 after:ease-elegant hover:after:w-full ${vis} ${pathname===h?"text-ink after:w-full":"text-muted hover:text-ink after:w-0"}`}>{t(k as string)}</Link>

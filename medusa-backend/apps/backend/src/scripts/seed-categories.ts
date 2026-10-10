@@ -6,9 +6,13 @@ import { createProductCategoriesWorkflow } from "@medusajs/medusa/core-flows";
 // handle = storefront category key (lowercased slug); name = brand display.
 export const CATEGORIES = [
   { handle: "converse", name: "Converse" },
+  { handle: "nike", name: "Nike" },
   { handle: "new-balance", name: "New Balance" },
+  { handle: "asics", name: "ASICS" },
+  { handle: "salomon", name: "Salomon" },
   { handle: "ugg", name: "UGG" },
   { handle: "the-north-face", name: "The North Face" },
+  { handle: "christian-dior", name: "Christian Dior" },
 ];
 
 // Brand name → handle, so seeders/importers can map their brand column.

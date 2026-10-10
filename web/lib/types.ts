@@ -16,14 +16,18 @@ export type Review = {
 /** Mean rating and count over a product's approved reviews. */
 export type ReviewSummary = { rating: number | null; count: number; reviews: Review[] };
 
-export type Category = "Converse" | "New Balance" | "UGG" | "The North Face";
+export type Category =
+  | "Converse" | "Nike" | "New Balance" | "ASICS" | "Salomon"
+  | "UGG" | "The North Face" | "Christian Dior";
 export type Shape =
-  // sneakers (Converse / New Balance)
-  | "runner" | "lowtop" | "hightop" | "chunky" | "skate" | "slide"
-  // UGG footwear
+  // sneakers
+  | "runner" | "lowtop" | "hightop" | "chunky" | "skate" | "slide" | "trail"
+  // winter footwear
   | "boot" | "slipper" | "clog" | "sneaker"
-  // The North Face outerwear
-  | "jacket" | "parka";
+  // outerwear
+  | "jacket" | "parka"
+  // bags and packs — no size options, one size
+  | "bag";
 
 export type Product = {
   id: string;
