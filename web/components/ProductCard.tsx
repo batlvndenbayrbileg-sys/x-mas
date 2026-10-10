@@ -41,7 +41,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
     >
       <Link href={`/product/${product.slug}`} className="group block">
         {/* Image — kept clean; controls overlay, product info sits below */}
-        <div className="relative overflow-hidden rounded-[1.4rem] aspect-[6/5] bg-white border border-line transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep">
+        <div className="relative overflow-hidden rounded-[1.4rem] aspect-[6/5] bg-[#F8F8F9] border border-line transition-[transform,box-shadow] duration-500 ease-elegant group-hover:-translate-y-1 group-hover:shadow-deep">
           <Photo
             src={product.image ?? productImg(product.id)}
             alt={product.name}
