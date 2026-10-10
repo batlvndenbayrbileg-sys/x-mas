@@ -37,6 +37,7 @@ export default function CheckoutPage() {
   const [promo, setPromo] = useState<{ discountTotal: number; shippingTotal: number; total: number } | null>(null);
   const [promoBusy, setPromoBusy] = useState(false);
   const [promoErr, setPromoErr] = useState("");
+  const [quote, setQuote] = useState<{ itemTotal: number; shippingTotal: number; discountTotal: number; total: number } | null>(null);
   useEffect(() => { setMounted(true); if (user?.email) setEmail(e => e || user.email); }, [user]);
 
   const subtotal = items.reduce((a, b) => a + b.price * b.qty, 0);
@@ -54,16 +55,32 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, items]);
 
+  // Re-price whenever the cart or the chosen shipping option changes. Skipped
+  // while a coupon is applied — previewPromo already returns priced totals.
+  useEffect(() => {
+    if (!mounted || promoCode) return;
+    const li = lineItemsFor();
+    if (!li.length) { setQuote(null); return; }
+    let cancelled = false;
+    medusa.quoteCart({ items: li, shippingOptionId: shipOptionId || undefined })
+      .then(q => { if (!cancelled) setQuote(q); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, items, shipOptionId, promoCode]);
+
   const selectedShip = shipOptions.find(o => o.id === shipOptionId);
-  // Automatic free shipping over the threshold (mirrors the backend promo so the
-  // summary matches the charge). Keep in sync with seed-free-shipping.ts.
-  const FREE_SHIP_THRESHOLD = 150000;
-  const freeByThreshold = subtotal >= FREE_SHIP_THRESHOLD;
-  const shipping = freeByThreshold ? 0 : (selectedShip ? selectedShip.amount : 0);
+
+  // What the shopper is shown must be what the invoice says, so the summary is
+  // Medusa's own pricing — automatic promotions (the free-shipping threshold)
+  // included. The local sum is only a placeholder until the quote lands.
+  const shipping = quote ? quote.shippingTotal : (selectedShip ? selectedShip.amount : 0);
   const tax = 0;
-  // Effective totals — Medusa's numbers when a coupon is applied, else local.
-  const discount = promo ? promo.discountTotal : 0;
-  const total = promo ? promo.total : subtotal + shipping + tax;
+  const discount = promo ? promo.discountTotal : (quote ? quote.discountTotal : 0);
+  const total = promo ? promo.total : (quote ? quote.total : subtotal + shipping);
+  // Cosmetic nudge only ("spend X more for free shipping") — it never decides a
+  // price, so a drift here cannot mis-charge anyone.
+  const FREE_SHIP_THRESHOLD = 150000;
   const freeShipRemaining = Math.max(0, FREE_SHIP_THRESHOLD - subtotal);
 
   async function applyPromo(code: string) {
@@ -298,7 +315,7 @@ export default function CheckoutPage() {
             <Row k={t("cart.subtotal")} v={money(subtotal)}/>
             {discount > 0 && <Row k={t("co.discount")} v={`− ${money(discount)}`}/>}
             <Row k={t("cart.shipping")} v={shipping === 0 ? t("common.free") : money(shipping)}/>
-            {mounted && !promo && (freeByThreshold ? (
+            {mounted && !promo && (shipping === 0 && subtotal > 0 ? (
               <div className="text-[12px] text-green-600 -mt-1 mb-2 flex items-center gap-1.5"><CheckIcon width={13} height={13}/> {t("co.freeShipEarned")}</div>
             ) : freeShipRemaining > 0 && (
               <div className="-mt-1 mb-2.5">

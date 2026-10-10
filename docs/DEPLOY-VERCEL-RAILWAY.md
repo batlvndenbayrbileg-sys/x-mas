@@ -145,6 +145,11 @@ npx medusa exec ./src/scripts/seed-return-shipping.ts
 npx medusa exec ./src/scripts/seed-categories.ts     # Converse, UGG, The North Face
 npx medusa exec ./src/scripts/seed-naran.ts          # the 64-product X-MAS catalogue
 npx medusa exec ./src/scripts/seed-inventory.ts
+npx medusa exec ./src/scripts/seed-free-shipping.ts  # REQUIRED — the checkout
+                                                    # shows free shipping over
+                                                    # ₮150,000; without this
+                                                    # promo the invoice is higher
+                                                    # than the total displayed
 npx medusa user -e admin@xmas.mn -p '<STRONG_PASSWORD>'
 ```
 

@@ -465,6 +465,47 @@ export const medusa = {
 
   // Validate a coupon and preview the discount on a throwaway cart. Medusa is
   // authoritative here and again at prepareCart, so the preview matches the charge.
+  // Price the cart exactly as Medusa will charge it — including automatic
+  // promotions such as the free-shipping threshold. The checkout used to add
+  // shipping up locally against a hardcoded threshold constant; when the
+  // backend promo was missing the page showed ₮349,000 and the invoice came to
+  // ₮354,000. Displaying the server's own number removes that whole class of
+  // drift: what the shopper sees is what the invoice says.
+  quoteCart: async (input: {
+    items: { variantId: string; quantity: number }[];
+    shippingOptionId?: string;
+  }): Promise<{ itemTotal: number; shippingTotal: number; discountTotal: number; total: number } | null> => {
+    if (!input.items.length) return null;
+    try {
+      const { cart } = await mpost("carts", {
+        region_id: REGION,
+        items: input.items.map(i => ({ variant_id: i.variantId, quantity: i.quantity })),
+      });
+      await mpost(`carts/${cart.id}`, {
+        shipping_address: { first_name: "Preview", last_name: "", address_1: "-", city: "Ulaanbaatar", postal_code: "14200", country_code: "mn" },
+      });
+      let priced = cart;
+      try {
+        const { shipping_options } = await mfetch(`shipping-options?cart_id=${cart.id}`);
+        const opt = (input.shippingOptionId && shipping_options.find((o: any) => o.id === input.shippingOptionId))
+          || shipping_options[0];
+        if (opt) {
+          const res = await mpost(`carts/${cart.id}/shipping-methods`, { option_id: opt.id });
+          priced = res.cart || priced;
+        }
+      } catch { /* no shipping options — item totals are still correct */ }
+      return {
+        itemTotal: Math.round(priced.item_total ?? 0),
+        shippingTotal: Math.round(priced.shipping_total ?? 0),
+        discountTotal: Math.round(priced.discount_total ?? 0),
+        total: Math.round(priced.total ?? 0),
+      };
+    } catch {
+      // Never block checkout on the quote — the caller falls back to its own sum.
+      return null;
+    }
+  },
+
   previewPromo: async (input: {
     items: { variantId: string; quantity: number }[];
     shippingMethod?: "standard" | "express";
