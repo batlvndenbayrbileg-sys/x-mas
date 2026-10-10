@@ -8,6 +8,7 @@ import { tFor, type Lang } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 import { TYPES, typeOf, isType, type ProductType } from "@/lib/taxonomy";
 import { SortSelect, ShopFilters } from "./_ShopControls";
+import { ShopGrid } from "./_ShopGrid";
 import { Reveal } from "@/app/[lang]/_components/Reveal";
 import type { Metadata } from "next";
 
@@ -64,14 +65,29 @@ export default async function ShopPage({
   const products = activeType ? all.filter(p => typeOf(p) === activeType) : all;
   const total = activeType ? products.length : allTotal;
 
-  // With nothing narrowed down, the page browses by type — two rows per section
-  // and a link through to the full list — instead of one undifferentiated grid.
+  // Browse by type whenever nothing but a brand is selected — so "all products"
+  // AND a brand page both split into Пүүз / Гутал / Куртик / Цүнх sections
+  // rather than one undifferentiated grid. Any sharper filter drops to a grid.
+  const activeCategory = searchParams.category && searchParams.category !== "all"
+    ? searchParams.category : undefined;
+  const BROWSE_SAFE = new Set(["sort", "category"]);
   const browsing = !activeType && !Object.entries(searchParams)
-    .some(([k, v]) => k !== "sort" && v);
+    .some(([k, v]) => !BROWSE_SAFE.has(k) && v);
   const sections = browsing
     ? TYPES.map(({ key }) => ({ key, items: products.filter(p => typeOf(p) === key) }))
         .filter(s => s.items.length > 0)
     : [];
+
+  // Links keep whichever axis is already set, so the two narrow together.
+  const shopHref = (next: { category?: string; type?: string }) => {
+    const q = new URLSearchParams();
+    const c = "category" in next ? next.category : activeCategory;
+    const ty = "type" in next ? next.type : activeType;
+    if (c) q.set("category", c);
+    if (ty) q.set("type", ty);
+    const qs = q.toString();
+    return qs ? `/shop?${qs}` : "/shop";
+  };
   // Real swatches: unique product accents, so every colour chip yields results.
   const availableColors = Array.from(new Set(allForColors.data.map(p => p.accent)));
 
@@ -89,7 +105,7 @@ export default async function ShopPage({
                 <span className="text-ink uppercase">{t("bc.shop")}</span><span className="opacity-40 mx-1">·</span><span>{total} {t("shop.items")}</span>
               </div>
               <h1 className="font-display text-[34px] sm:text-[52px] tracking-tight leading-[.95] uppercase mt-3">
-                {t("shop.titlePre")}{" "}
+                {activeCategory ? activeCategory : t("shop.titlePre")}{" "}
                 <span className="text-accent">
                   {activeType ? t(`type.${activeType}`) : t("shop.titleAll")}
                 </span>
@@ -104,7 +120,7 @@ export default async function ShopPage({
                 {cats.map(c => {
                   const active = (!searchParams.category && c === "all") || searchParams.category === c;
                   return (
-                    <Link key={c} href={c === "all" ? "/shop" : `/shop?category=${encodeURIComponent(c)}`}
+                    <Link key={c} href={shopHref({ category: c === "all" ? undefined : c })}
                       className={`h-9 px-4 rounded-pill text-[13px] font-medium inline-flex items-center whitespace-nowrap shrink-0 transition ${
                         active ? "bg-ink text-white" : "text-muted hover:text-ink"
                       }`}>
@@ -124,7 +140,7 @@ export default async function ShopPage({
             <div className="mt-4 flex items-center gap-2">
               <span className="inline-flex h-9 items-center gap-2 rounded-pill bg-ink pl-4 pr-1.5 text-[13px] font-medium text-white">
                 {t(`type.${activeType}`)}
-                <Link href="/shop" aria-label={t("shop.reset")}
+                <Link href={shopHref({ type: undefined })} aria-label={t("shop.reset")}
                   className="grid h-6 w-6 place-items-center rounded-full bg-white/15 text-[15px] leading-none transition-colors hover:bg-white/30">×</Link>
               </span>
             </div>
@@ -147,12 +163,10 @@ export default async function ShopPage({
             <>
               {sections.length > 0 ? (
                 sections.map(({ key, items }) => (
-                  <TypeSection key={key} type={key} items={items} lang={params.lang} />
+                  <TypeSection key={key} type={key} items={items} lang={params.lang} href={shopHref({ type: key })} />
                 ))
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
-                  {products.map((p, i) => <ProductCard key={p.id} product={p} index={i}/>)}
-                </div>
+                <ShopGrid products={products} />
               )}
             </>
           )}
@@ -165,12 +179,11 @@ export default async function ShopPage({
 }
 
 /** Two rows of one product type, with a way through to the rest of it. */
-function TypeSection({ type, items, lang }: { type: ProductType; items: Product[]; lang: Lang }) {
+function TypeSection({ type, items, lang, href }: { type: ProductType; items: Product[]; lang: Lang; href: string }) {
   const t = tFor(lang);
   // Two rows at the widest grid; narrower screens simply show more rows.
   const PREVIEW = 8;
   const shown = items.slice(0, PREVIEW);
-  const href = `/shop?type=${type}`;
 
   return (
     <section className="mt-10 first:mt-6">

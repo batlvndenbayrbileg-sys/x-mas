@@ -252,7 +252,7 @@ const en: Dict = {
   "shop.sortPriceDesc": "Price ↓", "shop.sortRating": "Top rated",
   "shop.filters": "Filters", "shop.fPrice": "Price", "shop.fTech": "Type", "shop.min": "Min", "shop.max": "Max",
   "shop.tLifestyle": "Lifestyle", "shop.tRunning": "Running", "shop.tSkate": "Skate", "shop.tCanvas": "Canvas",
-  "shop.emptyTitle": "Nothing here yet", "shop.emptyDesc": "Try a different brand.", "shop.reset": "Reset",
+  "shop.emptyTitle": "Nothing here yet", "shop.emptyDesc": "Try a different brand.", "shop.reset": "Reset", "shop.loadMore": "Load more",
   // mobile tab bar
   "tab.home": "Home", "tab.shop": "Shop", "tab.cart": "Cart", "tab.me": "Me",
 };
@@ -493,7 +493,7 @@ const mn: Dict = {
   "shop.sortPriceDesc": "Үнэ ↓", "shop.sortRating": "Үнэлгээгээр",
   "shop.filters": "Шүүлтүүр", "shop.fPrice": "Үнэ", "shop.fTech": "Төрөл", "shop.min": "Доод", "shop.max": "Дээд",
   "shop.tLifestyle": "Lifestyle", "shop.tRunning": "Гүйлт", "shop.tSkate": "Скейт", "shop.tCanvas": "Даавуу",
-  "shop.emptyTitle": "Энд одоохондоо юм алга", "shop.emptyDesc": "Өөр брэнд сонгож үзнэ үү.", "shop.reset": "Шинэчлэх",
+  "shop.emptyTitle": "Энд одоохондоо юм алга", "shop.emptyDesc": "Өөр брэнд сонгож үзнэ үү.", "shop.reset": "Шинэчлэх", "shop.loadMore": "Цааш үзэх",
   // mobile tab bar
   "tab.home": "Нүүр", "tab.shop": "Дэлгүүр", "tab.cart": "Сагс", "tab.me": "Би",
 };
