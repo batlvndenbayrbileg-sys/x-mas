@@ -1,27 +1,19 @@
 # X-MAS / NARAN — Railway deploy (low-maintenance PaaS)
 
-> ## ⭐ X-MAS deploy — read this first
-> This repo is the **X-MAS sneaker store**. Follow the full guide below, but with
-> these X-MAS values (they override the NARAN examples):
-> - **Repo:** `github.com/batlvndenbayrbileg-sys/xmas`, branch `main`
-> - **Services / root dirs / Dockerfiles** — unchanged: `medusa-backend/apps/backend`, `api`, `web`
-> - **Branding env:** `EMAIL_FROM=X-MAS <onboarding@resend.dev>`; domain `xmas.mn` (+ `api.xmas.mn` for medusa)
-> - **CORS:** point `STORE_CORS` / `AUTH_CORS` at the web domain, `ADMIN_CORS` at the medusa domain
-> - **Seed order** (step 5), run in the medusa service shell:
->   ```bash
->   cd .medusa/server
->   npx medusa exec ./src/scripts/seed-region.ts
->   npx medusa exec ./src/scripts/seed-shipping.ts
->   npx medusa exec ./src/scripts/seed-mnt.ts
->   npx medusa exec ./src/scripts/seed-categories.ts   # Converse + New Balance
->   npx medusa exec ./src/scripts/seed-naran.ts        # 30 X-MAS products
->   npx medusa exec ./src/scripts/seed-inventory.ts
->   npx medusa user -e admin@xmas.mn -p '<STRONG_PASSWORD>'
->   ```
-> - **Admin:** `admin@xmas.mn`. After seeding, copy the publishable key + MNT region
->   into the **web** service (`NEXT_PUBLIC_MEDUSA_PK` / `NEXT_PUBLIC_MEDUSA_REGION`) and redeploy web.
-> - Payments: set the `BOTXON_*` vars on **api** from your Botxon gateway.
-> - The build is verified (`npm run build` passes locally). Everything else below applies as-is.
+> ## ⭐ Deploying X-MAS? Read this first
+> This repo is the **X-MAS sneaker store** (`github.com/batlvndenbayrbileg-sys/x-mas`, branch `main`).
+>
+> **The storefront now goes on Vercel, not Railway** — follow
+> **[DEPLOY-VERCEL-RAILWAY.md](DEPLOY-VERCEL-RAILWAY.md)** instead of this file.
+> It covers the differences that matter: `api` needs a public domain (Vercel
+> cannot reach `*.railway.internal`), CORS points at the Vercel domain, and the
+> Botxon webhook goes straight to the api service.
+>
+> The guide below still describes the all-Railway layout correctly, and its
+> medusa/Postgres sections carry over unchanged. Two things in it are stale:
+> the catalogue is **64 products across Converse, UGG and The North Face**
+> (New Balance was retired), and the seed list omits `seed-shipping.ts` /
+> `seed-inventory.ts`.
 
 
 
