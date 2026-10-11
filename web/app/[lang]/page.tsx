@@ -175,9 +175,11 @@ export default async function HomePage({ params }: { params: { lang: Lang } }) {
               <p className="mt-3 text-[11.5px] font-semibold uppercase tracking-[.22em] text-accent">{t("strike.stampSub")}</p>
             </Reveal>
             <Reveal blur delay={0.08}>
-              <blockquote className="mx-auto mt-9 max-w-[720px] font-strike text-[24px] italic uppercase leading-tight sm:text-[34px]">
+              {/* A statement about the shop, not a quote from anyone — real
+                  customer reviews have their own section further down. */}
+              <p className="mx-auto mt-9 max-w-[720px] font-strike text-[24px] italic uppercase leading-tight sm:text-[34px]">
                 {t("strike.quote")}
-              </blockquote>
+              </p>
             </Reveal>
           </div>
         </section>
