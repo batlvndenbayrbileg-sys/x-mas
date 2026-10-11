@@ -35,6 +35,16 @@ const TickIcon = ({ width = 16, height = 16 }: { width?: number; height?: number
 // no box around it.
 const PANEL_SHOE = "/products/converse-chuck70-hi-black.webp";
 
+// Medusa returns its auth failures in English. Translate the ones a shopper
+// can reach; anything else is already one of our own Mongolian messages (the
+// rate limiter's, for one) and passes straight through.
+function authErrorKey(raw: string): "auth.wrongCreds" | "auth.emailTaken" | null {
+  const m = (raw || "").toLowerCase();
+  if (m.includes("invalid email or password") || m.includes("unauthorized")) return "auth.wrongCreds";
+  if (m.includes("already exists")) return "auth.emailTaken";
+  return null;
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const t = useT();
@@ -44,6 +54,8 @@ export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [busy, setBusy] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  // Unchecked means the sign-in lasts for this browser session only.
+  const [remember, setRemember] = useState(true);
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -87,11 +99,12 @@ export default function AuthPage() {
       } else {
         result = await api.auth.login(form.email, form.password);
       }
-      setSession(result.user, result.token);
+      setSession(result.user, result.token, remember);
       showToast(`${t("auth.welcomeName")}, ${result.user.firstName}!`);
       router.push(`/${lang}/account`);
     } catch (err: any) {
-      const msg = err.message || t("toast.authFailed");
+      const key = authErrorKey(err?.message);
+      const msg = key ? t(key) : (err.message || t("toast.authFailed"));
       showToast(msg);
       setFormError(msg);
       setBusy(false);
@@ -108,51 +121,26 @@ export default function AuthPage() {
   const toggle = () => { setMode(isReg ? "login" : "register"); setErrors({}); setFormError(""); };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-white px-4 py-8 sm:py-12">
-      <div className="relative w-full max-w-[1020px] overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-[0_40px_90px_-34px_rgba(22,21,21,.38)] sm:rounded-[2.25rem] lg:grid lg:min-h-[620px] lg:grid-cols-[1.05fr_1fr]">
+    <div className="grid min-h-screen place-items-center bg-mist px-4 py-8 sm:py-12">
+      <div className="relative w-full max-w-[1000px] overflow-hidden rounded-[1.75rem] bg-white shadow-[0_40px_90px_-34px_rgba(22,21,21,.35)] sm:rounded-[2rem] lg:grid lg:min-h-[580px] lg:grid-cols-2">
 
-        {/* ============ PANEL (desktop) ============ */}
-        <div className="relative hidden flex-col justify-between overflow-hidden bg-ink px-12 py-12 text-white lg:flex">
-          {/* accent bloom + oversized wordmark, as on the dark homepage band */}
-          <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[380px] w-[380px] rounded-full bg-accent/25 blur-[90px]" />
-          <span aria-hidden className="pointer-events-none absolute -bottom-6 -left-4 select-none font-display text-[150px] uppercase leading-none tracking-[.02em] text-white/[.045]">X-MAS</span>
-
-          <div className="relative z-10">
-            <Link href="/" aria-label="X-MAS" className="inline-block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="X-MAS" className="h-14 w-auto object-contain brightness-0 invert transition-opacity hover:opacity-80" />
-            </Link>
-            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[.2em] text-white/45">{t("auth.brandTag")}</p>
-            <h2 className="h-strike-2 mt-3 max-w-[9ch] text-white">{isReg ? t("auth.backPromo") : t("auth.newHere")}</h2>
-            <p className="mt-4 max-w-[330px] text-[14px] leading-relaxed text-white/60">{isReg ? t("auth.backPromoDesc") : t("auth.newHereDesc")}</p>
-
-            <ul className="mt-7 space-y-3">
-              {[t("auth.perk1"), t("auth.perk2"), t("auth.perk3")].map(perk => (
-                <li key={perk} className="flex items-center gap-3 text-[13.5px] text-white/85">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-white">
-                    <TickIcon width={13} height={13} />
-                  </span>
-                  {perk}
-                </li>
-              ))}
-            </ul>
+        {/* ============ PRODUCT PANEL (desktop) ============ */}
+        <div className="relative hidden overflow-hidden bg-ink lg:block">
+          <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 h-[420px] w-[420px] rounded-full bg-accent/25 blur-[100px]" />
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+          <div aria-hidden className="absolute inset-7 bottom-20">
+            <Photo src={PANEL_SHOE} alt="" sizes="500px"
+              imgClassName="object-contain drop-shadow-[0_34px_44px_rgba(0,0,0,.6)]" />
           </div>
-
-          <div className="relative z-10 flex items-end justify-between gap-4">
-            <button type="button" onClick={toggle}
-              className="h-12 shrink-0 rounded-pill border-2 border-white/70 px-8 text-[13px] font-semibold uppercase tracking-[.12em] transition-all duration-300 ease-spring hover:-translate-y-0.5 hover:bg-white hover:text-ink">
-              {isReg ? t("auth.signIn") : t("auth.signUp")}
-            </button>
-            <div aria-hidden className="relative -mb-6 -mr-6 h-[150px] w-[230px] shrink-0">
-              <Photo src={PANEL_SHOE} alt="" sizes="230px"
-                imgClassName="object-contain drop-shadow-[0_26px_30px_rgba(0,0,0,.5)]" />
-            </div>
-          </div>
+          <Link href="/" aria-label="X-MAS" className="absolute bottom-8 left-8 z-10 inline-block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="X-MAS" className="h-11 w-auto object-contain brightness-0 invert transition-opacity hover:opacity-80" />
+          </Link>
         </div>
 
         {/* ============ FORM ============ */}
-        <div className="relative flex flex-col justify-center px-6 py-9 sm:px-10 lg:px-12 lg:py-12">
-          {/* Mobile top: back · mark · switch */}
+        <div className="relative flex flex-col px-6 py-9 sm:px-10 lg:px-11 lg:py-12 lg:pb-[108px]">
+          {/* Mobile top: back · mark */}
           <div className="mb-7 flex items-center justify-between lg:hidden">
             <Link href="/" aria-label={t("bc.home")} className="-ml-1 grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-surface-2">
               <ChevronLeft width={20} height={20} />
@@ -161,13 +149,15 @@ export default function AuthPage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.png" alt="X-MAS" className="h-10 w-auto object-contain" />
             </Link>
-            <button type="button" onClick={toggle} className="-mr-2 px-2 py-2.5 text-[13px] font-semibold text-accent transition-colors hover:text-accent-deep">
-              {isReg ? t("auth.signIn") : t("auth.signUp")}
-            </button>
+            <span className="w-10" aria-hidden />
           </div>
 
-          <h1 className="h-strike-3 text-ink">{isForgot ? t("auth.forgotTitle") : isReg ? t("auth.signUp") : t("auth.signIn")}</h1>
-          <p className="mt-2 text-[14px] text-muted">{isForgot ? t("auth.forgotDesc") : isReg ? t("auth.freeForever") : t("auth.enterDetails")}</p>
+          <h1 className="font-display text-[30px] leading-[1.05] tracking-tight text-ink sm:text-[36px]">
+            {isForgot ? t("auth.forgotTitle") : isReg ? t("auth.createAccount") : t("auth.welcomeBack")}
+          </h1>
+          <p className="mt-2.5 max-w-[360px] text-[13.5px] leading-relaxed text-muted">
+            {isForgot ? t("auth.forgotDesc") : isReg ? t("auth.createDesc") : t("auth.signInDesc")}
+          </p>
 
           {isForgot && sent ? (
             <div className="mt-8 flex flex-col items-start text-left">
@@ -175,72 +165,100 @@ export default function AuthPage() {
                 <MailCheckIcon width={24} height={24} />
               </span>
               <h2 className="mt-4 font-display text-[20px] tracking-tight">{t("auth.resetSentTitle")}</h2>
-              <p className="mt-2 text-[14px] leading-relaxed text-muted max-w-[340px]">{t("auth.resetSentDesc")}</p>
-              <p className="mt-3 text-[13px] font-medium text-ink break-all">{form.email}</p>
+              <p className="mt-2 max-w-[340px] text-[14px] leading-relaxed text-muted">{t("auth.resetSentDesc")}</p>
+              <p className="mt-3 break-all text-[13px] font-medium text-ink">{form.email}</p>
               <button type="button" onClick={backToLogin}
                 className="mt-7 inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent hover:underline">
                 <ChevronLeft width={16} height={16} /> {t("auth.backToSignIn")}
               </button>
             </div>
           ) : (
-          <form onSubmit={submit} noValidate className="mt-7 space-y-3.5">
-            <FloatingField label={t("co.email")} name="email" type="email" inputMode="email" autoComplete="email"
-              value={form.email} onChange={update("email")} error={errors.email}/>
+          <>
+            {/* The submit button sits in the card's corner, outside this element,
+                so it is tied back to the form by id. */}
+            <form id="auth-form" onSubmit={submit} noValidate className="mt-7 space-y-3.5">
+              <FloatingField label={t("co.email")} name="email" type="email" inputMode="email" autoComplete="email"
+                value={form.email} onChange={update("email")} error={errors.email}/>
 
-            {isReg && (
-              <FloatingField label={t("auth.yourName")} name="name" autoComplete="name"
-                value={form.name} onChange={update("name")} error={errors.name}/>
-            )}
+              {isReg && (
+                <FloatingField label={t("auth.yourName")} name="name" autoComplete="name"
+                  value={form.name} onChange={update("name")} error={errors.name}/>
+              )}
 
-            {!isForgot && (
-            <FloatingField
-              label={t("auth.password")} name="password" type={showPw ? "text" : "password"}
-              autoComplete={isReg ? "new-password" : "current-password"}
-              value={form.password} onChange={update("password")} error={errors.password}
-              labelRight={isReg && form.password ? (
-                <span className="flex items-center gap-2">
-                  <span className="flex gap-1" aria-hidden>
-                    {[1, 2, 3].map(i => <span key={i} className="h-[3px] w-4 rounded-full" style={{ background: i <= score ? strengthColor : "#E3E3E6" }}/>)}
+              {!isForgot && (
+              <FloatingField
+                label={t("auth.password")} name="password" type={showPw ? "text" : "password"}
+                autoComplete={isReg ? "new-password" : "current-password"}
+                value={form.password} onChange={update("password")} error={errors.password}
+                labelRight={isReg && form.password ? (
+                  <span className="flex items-center gap-2">
+                    <span className="flex gap-1" aria-hidden>
+                      {[1, 2, 3].map(i => <span key={i} className="h-[3px] w-4 rounded-full" style={{ background: i <= score ? strengthColor : "#E3E3E6" }}/>)}
+                    </span>
+                    <span className="text-[11px] font-semibold" style={{ color: strengthColor }}>{strengthLabel}</span>
                   </span>
-                  <span className="text-[11px] font-semibold" style={{ color: strengthColor }}>{strengthLabel}</span>
-                </span>
-              ) : undefined}
-              right={
-                <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? t("auth.hidePw") : t("auth.showPw")}
-                  className="grid place-items-center w-9 h-9 -mr-1 rounded-full text-subtle hover:text-ink transition-colors">
-                  {showPw ? <EyeOffIcon width={18} height={18}/> : <EyeIcon width={18} height={18}/>}
-                </button>
-              }
-            />
-            )}
+                ) : undefined}
+                right={
+                  <button type="button" onClick={() => setShowPw(v => !v)} aria-label={showPw ? t("auth.hidePw") : t("auth.showPw")}
+                    className="-mr-1 grid h-9 w-9 place-items-center rounded-full text-subtle transition-colors hover:text-ink">
+                    {showPw ? <EyeOffIcon width={18} height={18}/> : <EyeIcon width={18} height={18}/>}
+                  </button>
+                }
+              />
+              )}
 
-            {!isReg && !isForgot && (
-              <div className="text-right -mt-1">
-                <button type="button" onClick={goForgot}
-                  className="-mr-1 px-1 py-2 text-[12.5px] text-muted transition-colors hover:text-accent">{t("auth.forgot")}</button>
-              </div>
-            )}
+              {!isReg && !isForgot && (
+                <div className="flex items-center justify-between gap-3 pt-0.5">
+                  <label className="inline-flex cursor-pointer select-none items-center gap-2.5 py-1 text-[13px] text-ink/75">
+                    <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)}
+                      className="h-[17px] w-[17px] cursor-pointer rounded-[5px] border-line accent-accent"/>
+                    {t("auth.remember")}
+                  </label>
+                  <button type="button" onClick={goForgot}
+                    className="-mr-1 px-1 py-1.5 text-[12.5px] text-muted underline-offset-2 transition-colors hover:text-accent hover:underline">
+                    {t("auth.forgot")}
+                  </button>
+                </div>
+              )}
 
-            {formError && (
-              <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" className="mt-0.5 shrink-0" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-                <span>{formError}</span>
-              </div>
-            )}
-            <button disabled={busy} type="submit"
-              className="grid h-[52px] w-full place-items-center rounded-pill bg-accent text-[13px] font-semibold uppercase tracking-[.12em] text-white shadow-[0_14px_32px_-12px_rgba(241,89,43,.7)] transition-all duration-300 ease-spring hover:bg-accent-deep hover:-translate-y-0.5 active:scale-[.99] disabled:translate-y-0 disabled:opacity-60">
-              {busy ? t("common.pleaseWait") : isForgot ? t("auth.sendResetLink") : isReg ? t("auth.signUp") : t("auth.signIn")}
-            </button>
+              {formError && (
+                <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" className="mt-0.5 shrink-0" aria-hidden><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+                  <span>{formError}</span>
+                </div>
+              )}
 
-            {isForgot && (
-              <div className="pt-2 text-center">
+              {/* On a phone there is no corner to anchor to. */}
+              <button disabled={busy} type="submit"
+                className="grid h-[52px] w-full place-items-center rounded-pill bg-accent text-[13px] font-semibold uppercase tracking-[.12em] text-white transition-colors hover:bg-accent-deep disabled:opacity-60 lg:hidden">
+                {busy ? t("common.pleaseWait") : isForgot ? t("auth.sendResetLink") : isReg ? t("auth.signUp") : t("auth.signIn")}
+              </button>
+            </form>
+
+            <div className="mt-7 text-[13px] lg:absolute lg:bottom-9 lg:left-11 lg:mt-0 lg:max-w-[46%]">
+              {isForgot ? (
                 <button type="button" onClick={backToLogin}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted hover:text-accent transition-colors">
+                  className="inline-flex items-center gap-1.5 font-medium text-muted transition-colors hover:text-accent">
                   <ChevronLeft width={16} height={16} /> {t("auth.backToSignIn")}
                 </button>
-              </div>
-            )}
-          </form>
+              ) : (
+                <>
+                  <span className="block text-muted">{isReg ? t("auth.haveAccount") : t("auth.noAccount")}</span>
+                  <button type="button" onClick={toggle}
+                    className="mt-0.5 inline-flex items-center gap-1 font-semibold text-ink transition-colors hover:text-accent">
+                    {isReg ? t("auth.signIn") : t("auth.signUp")}
+                    <span aria-hidden className="tracking-[-.08em] text-accent">›››</span>
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Anchored to the card's bottom-right corner, as the reference has it. */}
+            <button form="auth-form" disabled={busy} type="submit"
+              className="absolute bottom-0 right-0 hidden h-[84px] min-w-[190px] place-items-center rounded-tl-[1.5rem] rounded-br-[2rem] bg-accent px-10 text-[15px] font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60 lg:grid">
+              {busy ? t("common.pleaseWait") : isForgot ? t("auth.sendResetLink") : isReg ? t("auth.signUp") : t("auth.signIn")}
+            </button>
+          </>
           )}
         </div>
       </div>

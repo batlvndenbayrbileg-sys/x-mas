@@ -223,6 +223,7 @@ const en: Dict = {
   "rev.verified": "Verified purchase", "rev.outOf": "out of 5", "rev.countOne": "review", "rev.countMany": "reviews",
   "rev.wall": "What shoppers say", "rev.wallDesc": "Real reviews from X-MAS customers.",
   "auth.invalidEmail": "Enter a valid email", "auth.min8": "At least 8 characters",
+  "auth.wrongCreds": "Email or password is incorrect", "auth.emailTaken": "An account with this email already exists",
   "auth.demo": "Demo account:", "auth.welcomeName": "Welcome", "auth.google": "Google", "auth.apple": "Apple",
   "auth.showPw": "Show password", "auth.hidePw": "Hide password",
   "auth.pwStrength": "Password strength", "auth.pwWeak": "Weak", "auth.pwFair": "Fair", "auth.pwStrong": "Strong",
@@ -238,7 +239,7 @@ const en: Dict = {
   "reset.invalidTitle": "Link invalid or expired", "reset.invalidDesc": "This password reset link is no longer valid. Request a new one to continue.",
   "reset.requestNew": "Request a new link",
   "auth.brandTag": "Оригинал брэнд. Нэг дороос.",
-  "auth.perk1": "Early access to every drop", "auth.perk2": "Free shipping & 30-day returns", "auth.perk3": "Members-only releases",
+  "auth.perk1": "Track your orders", "auth.perk2": "Saved address — faster checkout", "auth.perk3": "Your wishlist, kept",
   "auth.enterDetails": "Enter your details below", "auth.getStartedFree": "Get started free.",
   "auth.freeForever": "Free forever. No card needed.", "auth.yourName": "Your name", "auth.getStarted": "Get Started", "auth.facebook": "Facebook",
   // account
@@ -464,6 +465,7 @@ const mn: Dict = {
   "rev.verified": "Баталгаажсан худалдан авалт", "rev.outOf": "/ 5", "rev.countOne": "сэтгэгдэл", "rev.countMany": "сэтгэгдэл",
   "rev.wall": "Хэрэглэгчид юу гэж байна", "rev.wallDesc": "X-MAS үйлчлүүлэгчдийн бодит сэтгэгдэл.",
   "auth.invalidEmail": "Зөв имэйл оруулна уу", "auth.min8": "Дор хаяж 8 тэмдэгт",
+  "auth.wrongCreds": "Имэйл эсвэл нууц үг буруу байна", "auth.emailTaken": "Энэ имэйлээр бүртгэл аль хэдийн үүссэн байна",
   "auth.demo": "Туршилтын бүртгэл:", "auth.welcomeName": "Тавтай морил", "auth.google": "Google", "auth.apple": "Apple",
   "auth.showPw": "Нууц үг харах", "auth.hidePw": "Нууц үг нуух",
   "auth.pwStrength": "Нууц үгийн хүч", "auth.pwWeak": "Сул", "auth.pwFair": "Дунд", "auth.pwStrong": "Хүчтэй",
@@ -479,7 +481,7 @@ const mn: Dict = {
   "reset.invalidTitle": "Холбоос хүчингүй эсвэл хугацаа дууссан", "reset.invalidDesc": "Энэ нууц үг сэргээх холбоос хүчингүй болжээ. Үргэлжлүүлэхийн тулд шинэ холбоос авна уу.",
   "reset.requestNew": "Шинэ холбоос авах",
   "auth.brandTag": "Оригинал брэнд. Нэг дороос.",
-  "auth.perk1": "Шинэ drop-д эрт хандах", "auth.perk2": "Үнэгүй хүргэлт, 30 хоног буцаалт", "auth.perk3": "Зөвхөн гишүүдийн гаралт",
+  "auth.perk1": "Захиалгынхаа явцыг хянах", "auth.perk2": "Хаяг хадгалагдаж, хурдан захиалах", "auth.perk3": "Хүслийн жагсаалт хадгалагдана",
   "auth.enterDetails": "Доорх мэдээллээ оруулна уу", "auth.getStartedFree": "Үнэгүй эхэл.",
   "auth.freeForever": "Үргэлж үнэгүй. Карт хэрэггүй.", "auth.yourName": "Таны нэр", "auth.getStarted": "Эхлэх", "auth.facebook": "Facebook",
   // account

@@ -53,16 +53,39 @@ export const useWish = create<WishState>()(
   )
 );
 
-type AuthState = { user: User | null; token: string | null; setSession: (u: User, t: string) => void; signOut: () => void };
+// Marks the current browser session. A sign-in made without "remember me"
+// still survives a reload (the flag is there), but not a browser restart
+// (sessionStorage is gone, so rehydrate signs them out).
+const SESSION_FLAG = "nitec-session";
+
+type AuthState = {
+  user: User | null;
+  token: string | null;
+  remember: boolean;
+  setSession: (u: User, t: string, remember?: boolean) => void;
+  signOut: () => void;
+};
 export const useAuth = create<AuthState>()(
   persist(
     set => ({
       user: null,
       token: null,
-      setSession: (user, token) => set({ user, token }),
+      remember: true,
+      setSession: (user, token, remember = true) => {
+        try { if (!remember) sessionStorage.setItem(SESSION_FLAG, "1"); } catch { /* private mode */ }
+        set({ user, token, remember });
+      },
       signOut: () => set({ user: null, token: null }),
     }),
-    { name: "nitec-auth" }
+    {
+      name: "nitec-auth",
+      onRehydrateStorage: () => (state) => {
+        if (!state?.token || state.remember) return;
+        let sameSession = false;
+        try { sameSession = sessionStorage.getItem(SESSION_FLAG) === "1"; } catch { /* private mode */ }
+        if (!sameSession) state.signOut();
+      },
+    }
   )
 );
 
